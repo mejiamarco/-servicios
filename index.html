@@ -196,7 +196,7 @@
 
                     if (data.entregado === true) {
                         resultBox.classList.add('bg-red-950', 'border-red-600');
-                        resultTitle.textContent = "⚠️ ¡ALERTA: ENTREGA DOBLE BLANQUEADA!";
+                        resultTitle.textContent = "⚠️ ¡ALERTA: ENTREGA DOBLE BLOQUEADA!";
                         resultName.textContent = data.nombre || "Sin Nombre";
                         resultDetails.textContent = `Ya retiró su refrigerio hoy a las: ${data.horaEntrega || '---'}.`;
                     } else {
@@ -240,13 +240,12 @@
 
             const worksheet = XLSX.utils.json_to_sheet(templateData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Participantes");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "PADRON_QR");
             
-            // Descargar archivo Excel real
             XLSX.writeFile(workbook, "plantilla_participantes_profe.xlsx");
         };
 
-        // Procesar Archivo Excel / CSV subido
+        // Procesar y Subir Archivo Excel / CSV (Inteligente y Robusto)
         window.procesarExcel = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -256,12 +255,16 @@
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    let sheetName = workbook.SheetNames[0];
+                    if (workbook.SheetNames.includes("PADRON_QR")) {
+                        sheetName = "PADRON_QR";
+                    }
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
                     if (jsonRows.length === 0) {
-                        alert("El archivo está vacío o no tiene el formato correcto.");
+                        alert("El archivo Excel está vacío o no tiene datos legibles.");
                         return;
                     }
 
@@ -270,13 +273,45 @@
                     let batchCount = 0;
 
                     for (let row of jsonRows) {
-                        const id = String(row.id || row.carnet || row.cedula || "").trim();
-                        const nombre = String(row.nombre || row.nombres || "").trim();
+                        let idVal = "";
+                        let nombreVal = "";
 
-                        if (id && nombre) {
-                            const docRef = doc(db, "participantes", id);
+                        // Búsqueda flexible de columnas de Identificación
+                        for (let key in row) {
+                            const kLower = key.toLowerCase().trim();
+                            if (kLower === 'id' || kLower === 'c.i.' || kLower === 'ci' || kLower === 'carnet' || kLower === 'cedula' || kLower.includes('c.i')) {
+                                idVal = String(row[key]).trim();
+                            }
+                        }
+
+                        // Búsqueda flexible de columnas de Nombres
+                        for (let key in row) {
+                            const kLower = key.toLowerCase().trim();
+                            if (kLower === 'nombre' || kLower === 'nombres' || kLower === 'nombre completo') {
+                                nombreVal = String(row[key]).trim();
+                            }
+                        }
+
+                        // Si no hay nombre directo, combinar apellido paterno, materno y nombres si existen en el Excel
+                        if (!nombreVal) {
+                            let pat = "";
+                            let mat = "";
+                            let nom = "";
+                            for (let key in row) {
+                                const kLower = key.toLowerCase().trim();
+                                if (kLower.includes('apellido pat') || kLower === 'pat.' || kLower.includes('paterno')) pat = String(row[key]).trim();
+                                if (kLower.includes('apellido mat') || kLower === 'mat.' || kLower.includes('materno')) mat = String(row[key]).trim();
+                                if (kLower === 'nombres' || kLower === 'nombre') nom = String(row[key]).trim();
+                            }
+                            if (nom || pat || mat) {
+                                nombreVal = [pat, mat, nom].filter(x => x && x !== 'nan').join(" ");
+                            }
+                        }
+
+                        if (idVal && idVal !== "nan" && nombreVal && nombreVal !== "nan") {
+                            const docRef = doc(db, "participantes", idVal);
                             batch.set(docRef, {
-                                nombre: nombre,
+                                nombre: nombreVal,
                                 entregado: false,
                                 horaEntrega: ""
                             });
@@ -295,11 +330,15 @@
                         await batch.commit();
                     }
 
-                    alert(`¡Carga exitosa! Se registraron/actualizaron ${contador} participantes en la base de datos.`);
+                    if (contador === 0) {
+                        alert("No se encontraron registros válidos. Verifica que las columnas contengan IDs y Nombres.");
+                    } else {
+                        alert(`¡Carga exitosa! Se registraron y actualizaron ${contador} participantes en la base de datos.`);
+                    }
                     document.getElementById('excel-file').value = "";
                 } catch (error) {
                     console.error("Error al procesar el archivo:", error);
-                    alert("Ocurrió un error al leer el archivo. Asegúrate de usar la plantilla Excel descargada.");
+                    alert("Error al procesar el archivo: " + error.message);
                 }
             };
             reader.readAsArrayBuffer(file);
