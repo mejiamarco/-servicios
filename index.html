@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Refrigerios - PROFE</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Librería HTML5 QR Code para la cámara -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <!-- Librería SheetJS (XLSX) para Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER RESPONSIVO -->
+    <header class="bg-slate-800 border-b border-slate-700 p-3 sm:p-4 shadow-md flex flex-wrap justify-between items-center gap-2">
+        <h1 class="text-base sm:text-lg font-bold text-cyan-400">Control de Refrigerios PROFE</h1>
+        <div id="user-info" class="text-xs sm:text-sm text-slate-400 hidden flex items-center gap-2 sm:gap-3">
+            <span id="user-email" class="text-slate-300 truncate max-w-[150px] sm:max-w-xs"></span> 
+            <button onclick="cerrarSesion()" class="bg-red-900/40 hover:bg-red-900 text-red-300 px-2.5 py-1 rounded text-xs border border-red-700 transition">Salir</button>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL RESPONSIVO -->
+    <main class="flex-grow p-3 sm:p-4 max-w-lg mx-auto w-full flex flex-col justify-center space-y-4">
+
+        <!-- PANTALLA 1: LOGIN DE ADMINISTRADOR -->
+        <div id="login-section" class="bg-slate-800 p-5 sm:p-6 rounded-xl border border-slate-700 shadow-xl w-full">
+            <h2 class="text-lg sm:text-xl font-semibold mb-4 text-center text-cyan-300">Acceso Administrador</h2>
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Correo Electrónico</label>
+                    <input type="email" id="email" required class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Contraseña</label>
+                    <input type="password" id="password" required class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+                <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold p-2.5 rounded text-sm transition">Ingresar al Sistema</button>
+                <p id="login-error" class="text-red-400 text-xs sm:text-sm text-center hidden mt-2"></p>
+            </form>
+        </div>
+
+        <!-- PANTALLA 2: APLICACIÓN (ESCANÉAR Y GESTIÓN) -->
+        <div id="app-section" class="hidden space-y-4 w-full">
+            
+            <!-- PANEL DE GESTIÓN Y CARGA (ADMIN) -->
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-xl space-y-3">
+                <h3 class="text-xs sm:text-sm font-semibold text-cyan-300 uppercase tracking-wider">Panel de Administración</h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button onclick="descargarPlantillaExcel()" class="bg-slate-700 hover:bg-slate-600 text-cyan-300 text-xs py-2 px-3 rounded border border-slate-600 transition flex items-center justify-center gap-1">
+                        📥 Descargar Plantilla Excel
+                    </button>
+                    <button onclick="confirmarReinicio()" class="bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 text-xs py-2 px-3 rounded border border-amber-700 transition flex items-center justify-center gap-1">
+                        🔄 Reiniciar Día
+                    </button>
+                </div>
+
+                <!-- CARGA DE EXCEL -->
+                <div class="pt-2 border-t border-slate-700">
+                    <label class="block text-xs text-slate-400 mb-1">Subir Padrón (.xlsx o .csv):</label>
+                    <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="procesarExcel(event)" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-slate-950 hover:file:bg-cyan-400 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- ESCÁNER DE CÁMARA (ADAPTADO A MÓVIL) -->
+            <div class="bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-700 shadow-xl text-center">
+                <h2 class="text-sm sm:text-md font-medium text-slate-300 mb-2">Escanear Código QR</h2>
+                <div id="reader" class="w-full rounded overflow-hidden border border-slate-700"></div>
+            </div>
+
+            <!-- RESULTADO DE LA VALIDACIÓN -->
+            <div id="result-box" class="hidden p-4 rounded-xl text-center border transition-all">
+                <p id="result-title" class="text-base sm:text-lg font-bold"></p>
+                <p id="result-name" class="text-lg sm:text-xl font-semibold mt-1"></p>
+                <p id="result-details" class="text-xs sm:text-sm mt-2"></p>
+                <button onclick="reiniciarEscanner()" class="mt-4 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-xs sm:text-sm">Escanear Siguiente</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-3 text-xs text-slate-500 border-t border-slate-800">
+        Sistema Seguro anti-duplicados • PROFE
+    </footer>
+
+    <!-- SCRIPTS DE FIREBASE Y LÓGICA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ==========================================
+        // TUS CREDENCIALES DE FIREBASE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYL6LrCODSyctVDYlde8PilNmSfM_fqb4",
+            authDomain: "control-refrigerios-profe.firebaseapp.com",
+            projectId: "control-refrigerios-profe",
+            storageBucket: "control-refrigerios-profe.firebasestorage.app",
+            messagingSenderId: "738331553720",
+            appId: "1:738331553720:web:ba584bc435ee22ffdf294d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let html5QrCode = null;
+        let scannerIsRunning = false;
+
+        // Login
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('login-error');
+
+            try {
+                errorElement.classList.add('hidden');
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                errorElement.textContent = "Error: Credenciales incorrectas o acceso denegado.";
+                errorElement.classList.remove('hidden');
+            }
+        };
+
+        // Logout
+        window.cerrarSesion = function() {
+            signOut(auth);
+        };
+
+        // Auth State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('app-section').classList.remove('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('user-email').textContent = user.email;
+                iniciarEscanner();
+            } else {
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('app-section').classList.add('hidden');
+                document.getElementById('user-info').classList.add('hidden');
+                
+                if (scannerIsRunning && html5QrCode) {
+                    html5QrCode.stop().then(() => { scannerIsRunning = false; }).catch(err => console.log(err));
+                }
+            }
+        });
+
+        // Escáner QR Responsivo
+        function iniciarEscanner() {
+            if (scannerIsRunning) return;
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                .then(() => { scannerIsRunning = true; })
+                .catch(err => {
+                    console.log("Error cámara: ", err);
+                });
+        }
+
+        async function onScanSuccess(decodedText) {
+            if (scannerIsRunning && html5QrCode) {
+                await html5QrCode.pause();
+                scannerIsRunning = false;
+            }
+            verificarYEntregarRefrigerio(decodedText.trim());
+        }
+
+        // Lógica de Validación y Entrega
+        async function verificarYEntregarRefrigerio(id) {
+            const resultBox = document.getElementById('result-box');
+            const resultTitle = document.getElementById('result-title');
+            const resultName = document.getElementById('result-name');
+            const resultDetails = document.getElementById('result-details');
+
+            resultBox.classList.remove('hidden', 'bg-emerald-950', 'border-emerald-600', 'bg-red-950', 'border-red-600');
+
+            try {
+                const docRef = doc(db, "participantes", id);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    resultBox.classList.add('bg-red-950', 'border-red-600');
+                    resultTitle.textContent = "❌ CÓDIGO INVÁLIDO";
+                    resultName.textContent = `ID: ${id}`;
+                    resultDetails.textContent = "Este código QR no se encuentra registrado en el padrón.";
+                } else {
+                    const data = docSnap.data();
+
+                    if (data.entregado === true) {
+                        resultBox.classList.add('bg-red-950', 'border-red-600');
+                        resultTitle.textContent = "⚠️ ¡ALERTA: ENTREGA DOBLE BLANQUEADA!";
+                        resultName.textContent = data.nombre || "Sin Nombre";
+                        resultDetails.textContent = `Ya retiró su refrigerio hoy a las: ${data.horaEntrega || '---'}.`;
+                    } else {
+                        const horaActual = new Date().toLocaleTimeString();
+                        await updateDoc(docRef, {
+                            entregado: true,
+                            horaEntrega: horaActual
+                        });
+
+                        resultBox.classList.add('bg-emerald-950', 'border-emerald-600');
+                        resultTitle.textContent = "✅ ¡REFRIGERIO AUTORIZADO!";
+                        resultName.textContent = data.nombre || "Participante";
+                        resultDetails.textContent = `Registrado con éxito a las ${horaActual}.`;
+                    }
+                }
+            } catch (error) {
+                resultBox.classList.add('bg-red-950', 'border-red-600');
+                resultTitle.textContent = "❌ ERROR DE CONEXIÓN";
+                resultName.textContent = "Error al procesar";
+                resultDetails.textContent = error.message;
+            }
+        }
+
+        window.reiniciarEscanner = function() {
+            document.getElementById('result-box').classList.add('hidden');
+            if (html5QrCode && !scannerIsRunning) {
+                html5QrCode.resume();
+                scannerIsRunning = true;
+            }
+        };
+
+        // ==========================================
+        // GENERACIÓN DE PLANTILLA EXCEL REAL (.XLSX)
+        // ==========================================
+        window.descargarPlantillaExcel = function() {
+            const templateData = [
+                { id: "7023201", nombre: "Juan Pérez Mamani" },
+                { id: "7023202", nombre: "María Limachi Quispe" },
+                { id: "7023203", nombre: "Carlos Quispe Condori" }
+            ];
+
+            const worksheet = XLSX.utils.json_to_sheet(templateData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Participantes");
+            
+            // Descargar archivo Excel real
+            XLSX.writeFile(workbook, "plantilla_participantes_profe.xlsx");
+        };
+
+        // Procesar Archivo Excel / CSV subido
+        window.procesarExcel = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (jsonRows.length === 0) {
+                        alert("El archivo está vacío o no tiene el formato correcto.");
+                        return;
+                    }
+
+                    let contador = 0;
+                    let batch = writeBatch(db);
+                    let batchCount = 0;
+
+                    for (let row of jsonRows) {
+                        const id = String(row.id || row.carnet || row.cedula || "").trim();
+                        const nombre = String(row.nombre || row.nombres || "").trim();
+
+                        if (id && nombre) {
+                            const docRef = doc(db, "participantes", id);
+                            batch.set(docRef, {
+                                nombre: nombre,
+                                entregado: false,
+                                horaEntrega: ""
+                            });
+                            contador++;
+                            batchCount++;
+
+                            if (batchCount >= 400) {
+                                await batch.commit();
+                                batch = writeBatch(db);
+                                batchCount = 0;
+                            }
+                        }
+                    }
+
+                    if (batchCount > 0) {
+                        await batch.commit();
+                    }
+
+                    alert(`¡Carga exitosa! Se registraron/actualizaron ${contador} participantes en la base de datos.`);
+                    document.getElementById('excel-file').value = "";
+                } catch (error) {
+                    console.error("Error al procesar el archivo:", error);
+                    alert("Ocurrió un error al leer el archivo. Asegúrate de usar la plantilla Excel descargada.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        // Reiniciar Jornada (Nuevo día)
+        window.confirmarReinicio = async function() {
+            const confirmar = confirm("⚠️ ¿Estás seguro de reiniciar los registros para un nuevo día? Todos los estados volverán a 'No entregado' (false).");
+            if (!confirmar) return;
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "participantes"));
+                let batch = writeBatch(db);
+                let count = 0;
+
+                querySnapshot.forEach((documento) => {
+                    const docRef = doc(db, "participantes", documento.id);
+                    batch.update(docRef, {
+                        entregado: false,
+                        horaEntrega: ""
+                    });
+                    count++;
+                });
+
+                await batch.commit();
+                alert(`✅ ¡Jornada reiniciada con éxito! Se habilitaron ${count} participantes para el nuevo día.`);
+            } catch (error) {
+                console.error("Error al reiniciar:", error);
+                alert("Hubo un error al intentar reiniciar la jornada.");
+            }
+        };
+    </script>
+</body>
+</html>
