@@ -86,14 +86,14 @@
         Sistema Seguro anti-duplicados • PROFE
     </footer>
 
-    <!-- SCRIPT DE FIREBASE Y LÓGICA -->
+    <!-- SCRIPT DE FIREBASE REALTIME DATABASE Y LÓGICA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // ==========================================
-        // CONFIGURACIÓN OFICIAL DE FIREBASE
+        // CREDENCIALES OFICIALES DE FIREBASE
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyCYL6LrCODSyctVDYlde8PilNmSfM_fqb4",
@@ -108,7 +108,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getDatabase(app);
 
         let html5QrCode = null;
         let scannerIsRunning = false;
@@ -172,7 +172,7 @@
             verificarYEntregarRefrigerio(decodedText.trim());
         }
 
-        // Lógica de Validación y Anti-Duplicados
+        // Lógica de Validación y Anti-Duplicados (Realtime Database)
         async function verificarYEntregarRefrigerio(id) {
             const resultBox = document.getElementById('result-box');
             const resultTitle = document.getElementById('result-title');
@@ -182,16 +182,16 @@
             resultBox.classList.remove('hidden', 'bg-emerald-950', 'border-emerald-600', 'bg-red-950', 'border-red-600');
 
             try {
-                const docRef = doc(db, "participantes", id);
-                const docSnap = await getDoc(docRef);
+                const participanteRef = ref(db, 'participantes/' + id);
+                const snapshot = await get(participanteRef);
 
-                if (!docSnap.exists()) {
+                if (!snapshot.exists()) {
                     resultBox.classList.add('bg-red-950', 'border-red-600');
                     resultTitle.textContent = "❌ CÓDIGO INVÁLIDO";
                     resultName.textContent = `ID: ${id}`;
-                    resultDetails.textContent = "Este código QR no se encuentra registrado.";
+                    resultDetails.textContent = "Este código QR no se encuentra registrado en el padrón.";
                 } else {
-                    const data = docSnap.data();
+                    const data = snapshot.val();
 
                     if (data.entregado === true) {
                         resultBox.classList.add('bg-red-950', 'border-red-600');
@@ -200,7 +200,7 @@
                         resultDetails.textContent = `Ya retiró su refrigerio a las: ${data.horaEntrega || '---'}.`;
                     } else {
                         const horaActual = new Date().toLocaleTimeString();
-                        await updateDoc(docRef, {
+                        await update(participanteRef, {
                             entregado: true,
                             horaEntrega: horaActual
                         });
@@ -239,7 +239,7 @@
             XLSX.writeFile(workbook, "plantilla_participantes_profe.xlsx");
         };
 
-        // Carga Masiva de Excel a Firebase (Escritura Directa)
+        // Carga Masiva de Excel a Realtime Database
         window.procesarExcel = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -263,12 +263,12 @@
                         let nombreVal = String(row.nombre || row.Nombres || "").trim();
 
                         if (idVal && idVal !== "nan" && nombreVal && nombreVal !== "nan") {
-                            const docRef = doc(db, "participantes", idVal);
-                            await setDoc(docRef, {
+                            const participanteRef = ref(db, 'participantes/' + idVal);
+                            await set(participanteRef, {
                                 nombre: nombreVal,
                                 entregado: false,
                                 horaEntrega: ""
-                            }, { merge: true });
+                            });
                             contador++;
                         }
                     }
@@ -287,13 +287,23 @@
         window.confirmarReinicio = async function() {
             if (!confirm("¿Reiniciar registros para un nuevo día?")) return;
             try {
-                const querySnapshot = await getDocs(collection(db, "participantes"));
-                let count = 0;
-                for (let documento of querySnapshot.docs) {
-                    await updateDoc(doc(db, "participantes", documento.id), { entregado: false, horaEntrega: "" });
-                    count++;
+                const participantesRef = ref(db, 'participantes');
+                const snapshot = await get(participantesRef);
+                
+                if (snapshot.exists()) {
+                    let updates = {};
+                    let count = 0;
+                    snapshot.forEach((child) => {
+                        const key = child.key;
+                        updates[`participantes/${key}/entregado`] = false;
+                        updates[`participantes/${key}/horaEntrega`] = "";
+                        count++;
+                    });
+                    await update(ref(db), updates);
+                    alert(`¡Jornada reiniciada! ${count} participantes habilitados.`);
+                } else {
+                    alert("No hay participantes registrados.");
                 }
-                alert(`¡Jornada reiniciada! ${count} participantes habilitados.`);
             } catch (error) {
                 alert("Error al reiniciar: " + error.message);
             }
