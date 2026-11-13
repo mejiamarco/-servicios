@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Refrigerios - PROFE</title>
+    <title>Control de Refrigerios - PROFE (v3)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Librería HTML5 QR Code para la cámara -->
@@ -15,7 +15,7 @@
 
     <!-- HEADER RESPONSIVO -->
     <header class="bg-slate-800 border-b border-slate-700 p-3 sm:p-4 shadow-md flex flex-wrap justify-between items-center gap-2">
-        <h1 class="text-base sm:text-lg font-bold text-cyan-400">Control de Refrigerios PROFE</h1>
+        <h1 class="text-base sm:text-lg font-bold text-cyan-400">Control de Refrigerios PROFE <span class="text-xs text-amber-400">(v3)</span></h1>
         <div id="user-info" class="text-xs sm:text-sm text-slate-400 hidden flex items-center gap-2 sm:gap-3">
             <span id="user-email" class="text-slate-300 truncate max-w-[150px] sm:max-w-xs"></span> 
             <button onclick="cerrarSesion()" class="bg-red-900/40 hover:bg-red-900 text-red-300 px-2.5 py-1 rounded text-xs border border-red-700 transition">Salir</button>
@@ -65,7 +65,7 @@
                 </div>
             </div>
 
-            <!-- ESCÁNER DE CÁMARA (ADAPTADO A MÓVIL) -->
+            <!-- ESCÁNER DE CÁMARA -->
             <div class="bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-700 shadow-xl text-center">
                 <h2 class="text-sm sm:text-md font-medium text-slate-300 mb-2">Escanear Código QR</h2>
                 <div id="reader" class="w-full rounded overflow-hidden border border-slate-700"></div>
@@ -91,11 +91,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ==========================================
-        // TUS CREDENCIALES DE FIREBASE
-        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyCYL6LrCODSyctVDYlde8PilNmSfM_fqb4",
             authDomain: "control-refrigerios-profe.firebaseapp.com",
@@ -112,7 +109,6 @@
         let html5QrCode = null;
         let scannerIsRunning = false;
 
-        // Login
         window.handleLogin = async function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -123,17 +119,15 @@
                 errorElement.classList.add('hidden');
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                errorElement.textContent = "Error: Credenciales incorrectas o acceso denegado.";
+                errorElement.textContent = "Error: Credenciales incorrectas.";
                 errorElement.classList.remove('hidden');
             }
         };
 
-        // Logout
         window.cerrarSesion = function() {
             signOut(auth);
         };
 
-        // Auth State
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('login-section').classList.add('hidden');
@@ -152,7 +146,6 @@
             }
         });
 
-        // Escáner QR Responsivo
         function iniciarEscanner() {
             if (scannerIsRunning) return;
             html5QrCode = new Html5Qrcode("reader");
@@ -160,9 +153,7 @@
 
             html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
                 .then(() => { scannerIsRunning = true; })
-                .catch(err => {
-                    console.log("Error cámara: ", err);
-                });
+                .catch(err => console.log("Error cámara: ", err));
         }
 
         async function onScanSuccess(decodedText) {
@@ -173,7 +164,6 @@
             verificarYEntregarRefrigerio(decodedText.trim());
         }
 
-        // Lógica de Validación y Entrega
         async function verificarYEntregarRefrigerio(id) {
             const resultBox = document.getElementById('result-box');
             const resultTitle = document.getElementById('result-title');
@@ -190,15 +180,15 @@
                     resultBox.classList.add('bg-red-950', 'border-red-600');
                     resultTitle.textContent = "❌ CÓDIGO INVÁLIDO";
                     resultName.textContent = `ID: ${id}`;
-                    resultDetails.textContent = "Este código QR no se encuentra registrado en el padrón.";
+                    resultDetails.textContent = "Este código QR no se encuentra registrado.";
                 } else {
                     const data = docSnap.data();
 
                     if (data.entregado === true) {
                         resultBox.classList.add('bg-red-950', 'border-red-600');
-                        resultTitle.textContent = "⚠️ ¡ALERTA: ENTREGA DOBLE BLOQUEADA!";
+                        resultTitle.textContent = "⚠️ ¡ALERTA: ENTREGA DOBLE!";
                         resultName.textContent = data.nombre || "Sin Nombre";
-                        resultDetails.textContent = `Ya retiró su refrigerio hoy a las: ${data.horaEntrega || '---'}.`;
+                        resultDetails.textContent = `Ya retiró su refrigerio a las: ${data.horaEntrega || '---'}.`;
                     } else {
                         const horaActual = new Date().toLocaleTimeString();
                         await updateDoc(docRef, {
@@ -214,7 +204,7 @@
                 }
             } catch (error) {
                 resultBox.classList.add('bg-red-950', 'border-red-600');
-                resultTitle.textContent = "❌ ERROR DE CONEXIÓN";
+                resultTitle.textContent = "❌ ERROR";
                 resultName.textContent = "Error al procesar";
                 resultDetails.textContent = error.message;
             }
@@ -228,24 +218,17 @@
             }
         };
 
-        // ==========================================
-        // GENERACIÓN DE PLANTILLA EXCEL REAL (.XLSX)
-        // ==========================================
         window.descargarPlantillaExcel = function() {
             const templateData = [
-                { id: "7023201", nombre: "Juan Pérez Mamani" },
-                { id: "7023202", nombre: "María Limachi Quispe" },
-                { id: "7023203", nombre: "Carlos Quispe Condori" }
+                { id: "5637347", nombre: "GISBERT MAMANI CINTIA VERONICA" },
+                { id: "14122404", nombre: "VALENCIA CATARI JUAN PABLO" }
             ];
-
             const worksheet = XLSX.utils.json_to_sheet(templateData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "PADRON_QR");
-            
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Participantes");
             XLSX.writeFile(workbook, "plantilla_participantes_profe.xlsx");
         };
 
-        // Procesar y Subir Archivo Excel / CSV (Inteligente y Robusto)
         window.procesarExcel = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -255,119 +238,52 @@
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    
-                    let sheetName = workbook.SheetNames[0];
-                    if (workbook.SheetNames.includes("PADRON_QR")) {
-                        sheetName = "PADRON_QR";
-                    }
-                    const worksheet = workbook.Sheets[sheetName];
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
                     if (jsonRows.length === 0) {
-                        alert("El archivo Excel está vacío o no tiene datos legibles.");
+                        alert("El archivo Excel está vacío.");
                         return;
                     }
 
                     let contador = 0;
-                    let batch = writeBatch(db);
-                    let batchCount = 0;
-
                     for (let row of jsonRows) {
-                        let idVal = "";
-                        let nombreVal = "";
-
-                        // Búsqueda flexible de columnas de Identificación
-                        for (let key in row) {
-                            const kLower = key.toLowerCase().trim();
-                            if (kLower === 'id' || kLower === 'c.i.' || kLower === 'ci' || kLower === 'carnet' || kLower === 'cedula' || kLower.includes('c.i')) {
-                                idVal = String(row[key]).trim();
-                            }
-                        }
-
-                        // Búsqueda flexible de columnas de Nombres
-                        for (let key in row) {
-                            const kLower = key.toLowerCase().trim();
-                            if (kLower === 'nombre' || kLower === 'nombres' || kLower === 'nombre completo') {
-                                nombreVal = String(row[key]).trim();
-                            }
-                        }
-
-                        // Si no hay nombre directo, combinar apellido paterno, materno y nombres si existen en el Excel
-                        if (!nombreVal) {
-                            let pat = "";
-                            let mat = "";
-                            let nom = "";
-                            for (let key in row) {
-                                const kLower = key.toLowerCase().trim();
-                                if (kLower.includes('apellido pat') || kLower === 'pat.' || kLower.includes('paterno')) pat = String(row[key]).trim();
-                                if (kLower.includes('apellido mat') || kLower === 'mat.' || kLower.includes('materno')) mat = String(row[key]).trim();
-                                if (kLower === 'nombres' || kLower === 'nombre') nom = String(row[key]).trim();
-                            }
-                            if (nom || pat || mat) {
-                                nombreVal = [pat, mat, nom].filter(x => x && x !== 'nan').join(" ");
-                            }
-                        }
+                        let idVal = String(row.id || row.C_I || row.CI || row.carnet || "").trim();
+                        let nombreVal = String(row.nombre || row.Nombres || "").trim();
 
                         if (idVal && idVal !== "nan" && nombreVal && nombreVal !== "nan") {
                             const docRef = doc(db, "participantes", idVal);
-                            batch.set(docRef, {
+                            await setDoc(docRef, {
                                 nombre: nombreVal,
                                 entregado: false,
                                 horaEntrega: ""
-                            });
+                            }, { merge: true });
                             contador++;
-                            batchCount++;
-
-                            if (batchCount >= 400) {
-                                await batch.commit();
-                                batch = writeBatch(db);
-                                batchCount = 0;
-                            }
                         }
                     }
 
-                    if (batchCount > 0) {
-                        await batch.commit();
-                    }
-
-                    if (contador === 0) {
-                        alert("No se encontraron registros válidos. Verifica que las columnas contengan IDs y Nombres.");
-                    } else {
-                        alert(`¡Carga exitosa! Se registraron y actualizaron ${contador} participantes en la base de datos.`);
-                    }
+                    alert(`¡Carga exitosa! Se registraron ${contador} participantes.`);
                     document.getElementById('excel-file').value = "";
                 } catch (error) {
-                    console.error("Error al procesar el archivo:", error);
-                    alert("Error al procesar el archivo: " + error.message);
+                    console.error("Error detallado:", error);
+                    alert("Error al guardar en Firebase: " + error.message);
                 }
             };
             reader.readAsArrayBuffer(file);
         };
 
-        // Reiniciar Jornada (Nuevo día)
         window.confirmarReinicio = async function() {
-            const confirmar = confirm("⚠️ ¿Estás seguro de reiniciar los registros para un nuevo día? Todos los estados volverán a 'No entregado' (false).");
-            if (!confirmar) return;
-
+            if (!confirm("¿Reiniciar registros para un nuevo día?")) return;
             try {
                 const querySnapshot = await getDocs(collection(db, "participantes"));
-                let batch = writeBatch(db);
                 let count = 0;
-
-                querySnapshot.forEach((documento) => {
-                    const docRef = doc(db, "participantes", documento.id);
-                    batch.update(docRef, {
-                        entregado: false,
-                        horaEntrega: ""
-                    });
+                for (let documento of querySnapshot.docs) {
+                    await updateDoc(doc(db, "participantes", documento.id), { entregado: false, horaEntrega: "" });
                     count++;
-                });
-
-                await batch.commit();
-                alert(`✅ ¡Jornada reiniciada con éxito! Se habilitaron ${count} participantes para el nuevo día.`);
+                }
+                alert(`¡Jornada reiniciada! ${count} participantes habilitados.`);
             } catch (error) {
-                console.error("Error al reiniciar:", error);
-                alert("Hubo un error al intentar reiniciar la jornada.");
+                alert("Error al reiniciar: " + error.message);
             }
         };
     </script>
