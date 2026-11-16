@@ -1,96 +1,156 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Refrigerios - PROFE</title>
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Control de Refrigerios - PROFE Bolivia</title>
+    <!-- Tailwind CSS CDN (v3) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Librería HTML5 QR Code para la cámara -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <!-- Librería SheetJS (XLSX) para Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bolivia-blue': '#1E293B', // Azul Oscuro Institucional
+                        'bolivia-cyan': '#0EA5E9', // Cian Acento
+                        'bolivia-gold': '#FBBF24', // Dorado Énfasis
+                        'bg-dark': '#0F172A',     // Fondo Profundo
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+<body class="h-full font-sans text-slate-100 flex flex-col antialiased">
 
     <!-- HEADER RESPONSIVO -->
-    <header class="bg-slate-800 border-b border-slate-700 p-3 sm:p-4 shadow-md flex flex-wrap justify-between items-center gap-2">
-        <h1 class="text-base sm:text-lg font-bold text-cyan-400">Control de Refrigerios PROFE</h1>
-        <div id="user-info" class="text-xs sm:text-sm text-slate-400 hidden flex items-center gap-2 sm:gap-3">
-            <span id="user-email" class="text-slate-300 truncate max-w-[150px] sm:max-w-xs"></span> 
-            <button onclick="cerrarSesion()" class="bg-red-900/40 hover:bg-red-900 text-red-300 px-2.5 py-1 rounded text-xs border border-red-700 transition">Salir</button>
+    <header class="bg-bolivia-blue border-b border-slate-700 shadow-lg p-3 flex justify-between items-center gap-4 z-50 sticky top-0">
+        <div class="flex items-center gap-3">
+            <!-- ESPACIO PARA EL ESCUDO.PNG -->
+            <img src="escudo.png" alt="Escudo de Bolivia" class="h-10 w-auto object-contain" onerror="this.style.display='none'; document.getElementById('fallback-title').classList.remove('hidden');">
+            <div id="fallback-title" class="hidden text-left">
+                <h1 class="text-sm font-bold text-white">MINISTERIO DE EDUCACIÓN</h1>
+                <p class="text-[10px] text-slate-300">ESTADO PLURINACIONAL DE BOLIVIA</p>
+            </div>
+            <h2 class="text-xs font-medium text-slate-200 hidden sm:block border-l pl-3 border-slate-500">Control de Refrigerios PROFE</h2>
+        </div>
+        
+        <div id="user-info" class="text-sm text-slate-300 hidden flex items-center gap-3">
+            <span id="user-email" class="text-slate-100 font-medium text-xs truncate max-w-[120px]"></span> 
+            <button onclick="cerrarSesion()" class="bg-red-800/70 hover:bg-red-700 text-red-100 px-3 py-1.5 rounded-full text-[10px] font-semibold transition">Salir</button>
         </div>
     </header>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-grow p-3 sm:p-4 max-w-lg mx-auto w-full flex flex-col justify-center space-y-4">
+    <main class="flex-grow p-4 sm:p-6 flex flex-col items-center justify-center bg-bg-dark">
 
-        <!-- PANTALLA 1: LOGIN DE ADMINISTRADOR -->
-        <div id="login-section" class="bg-slate-800 p-5 sm:p-6 rounded-xl border border-slate-700 shadow-xl w-full">
-            <h2 class="text-lg sm:text-xl font-semibold mb-4 text-center text-cyan-300">Acceso Administrador</h2>
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+        <!-- PANTALLA 1: LOGIN ADMINISTRADOR -->
+        <div id="login-section" class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-200 transition-all duration-500 ease-in-out scale-100">
+            <div class="mb-8 text-center">
+                <!-- Logo PROFE estilizado -->
+                <div class="text-4xl font-extrabold text-bolivia-blue mb-1 tracking-tight">PROFE</div>
+                <p class="text-sm text-slate-700 font-medium">PROGRAMA DE FORMACIÓN ESPECIALIZADA</p>
+                <p class="text-xs text-slate-500 mt-1">Acceso Exclusivo Administrador</p>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
                 <div>
-                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Correo Electrónico</label>
-                    <input type="email" id="email" required class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white text-sm focus:outline-none focus:border-cyan-400">
+                    <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">Correo</label>
+                    <input type="email" id="email" required placeholder="admin@minedu.gob.bo" class="w-full bg-slate-100 border border-slate-300 rounded-xl p-3 text-slate-950 text-sm focus:ring-2 focus:ring-bolivia-cyan focus:border-bolivia-cyan outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Contraseña</label>
-                    <input type="password" id="password" required class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white text-sm focus:outline-none focus:border-cyan-400">
+                    <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">Contraseña</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full bg-slate-100 border border-slate-300 rounded-xl p-3 text-slate-950 text-sm focus:ring-2 focus:ring-bolivia-cyan focus:border-bolivia-cyan outline-none transition">
                 </div>
-                <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold p-2.5 rounded text-sm transition">Ingresar al Sistema</button>
-                <p id="login-error" class="text-red-400 text-xs sm:text-sm text-center hidden mt-2"></p>
+                <button type="submit" class="w-full bg-bolivia-cyan hover:bg-sky-600 text-white font-bold p-3.5 rounded-xl text-sm transition duration-300 transform hover:scale-[1.01] shadow-md">Ingresar al Sistema</button>
+                <p id="login-error" class="text-red-600 text-xs text-center hidden mt-2"></p>
             </form>
         </div>
 
         <!-- PANTALLA 2: APLICACIÓN (ESCANER Y GESTIÓN) -->
-        <div id="app-section" class="hidden space-y-4 w-full">
+        <div id="app-section" class="hidden w-full max-w-3xl grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-500 ease-in-out">
             
-            <!-- PANEL DE ADMINISTRACIÓN -->
-            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-xl space-y-3">
-                <h3 class="text-xs sm:text-sm font-semibold text-cyan-300 uppercase tracking-wider">Panel de Administración</h3>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <button onclick="descargarPlantillaExcel()" class="bg-slate-700 hover:bg-slate-600 text-cyan-300 text-xs py-2 px-3 rounded border border-slate-600 transition flex items-center justify-center gap-1">
-                        📥 Descargar Plantilla Excel
-                    </button>
-                    <button onclick="confirmarReinicio()" class="bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 text-xs py-2 px-3 rounded border border-amber-700 transition flex items-center justify-center gap-1">
-                        🔄 Reiniciar Día
-                    </button>
+            <!-- COLUMNA IZQUIERDA: ADMINISTRACIÓN -->
+            <div class="lg:col-span-1 space-y-6 order-2 lg:order-1">
+                <!-- Panel de Control -->
+                <div class="bg-bolivia-blue p-6 rounded-3xl shadow-xl border border-slate-700 space-y-5">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-bolivia-gold">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.188 1.13c.123.737.688 1.292 1.425 1.415l1.13.188c.542.09.94.56.94 1.11v1.093c0 .55-.398 1.02-.94 1.11l-1.13.188c-.737.123-1.292.688-1.415 1.425l-.188 1.13c-.09.542-.56.94-1.11.94h-1.093c-.55 0-1.02-.398-1.11-.94l-.188-1.13c-.123-.737-.688-1.292-1.425-1.415l-1.13-.188c-.542-.09-.94-.56-.94-1.11V10.5c0-.55.398-1.02.94-1.11l1.13-.188c.737-.123 1.292-.688 1.415-1.425l.188-1.13Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 14.25a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v4.75m0 0c3.406 0 6.505-1.246 8.89-3.316M12 22.75C8.594 22.75 5.495 21.504 3.11 19.434M3.11 19.434a3.492 3.492 0 0 1-.11-4.348M15 14.25a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75V3.5m0 0C9.478 5.435 6.146 6.75 2.5 6.75M12 3.5c2.522 1.935 5.854 3.25 9.5 3.25" />
+                        </svg>
+                        ADMINISTRACIÓN
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        <button onclick="descargarPlantillaExcel()" class="bg-slate-700/50 hover:bg-slate-700 text-bolivia-cyan text-xs py-3 px-4 rounded-xl border border-slate-600 transition flex items-center justify-center gap-2 font-medium">
+                            📥 Descargar Plantilla Excel
+                        </button>
+                        <button onclick="confirmarReinicio()" class="bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 text-xs py-3 px-4 rounded-xl border border-amber-800 transition flex items-center justify-center gap-2 font-medium">
+                            🔄 Reiniciar Día
+                        </button>
+                    </div>
+
+                    <!-- CARGA DE EXCEL -->
+                    <div class="pt-5 border-t border-slate-600">
+                        <label class="block text-xs text-slate-300 font-medium mb-2">Cargar Padrón (.xlsx, .csv):</label>
+                        <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="procesarExcel(event)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 File:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-bolivia-cyan/20 file:text-bolivia-cyan hover:file:bg-bolivia-cyan/30 cursor-pointer bg-slate-700 rounded-lg p-1">
+                    </div>
                 </div>
 
-                <!-- CARGA DE EXCEL -->
-                <div class="pt-2 border-t border-slate-700">
-                    <label class="block text-xs text-slate-400 mb-1">Subir Padrón (.xlsx o .csv):</label>
-                    <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="procesarExcel(event)" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-slate-950 hover:file:bg-cyan-400 cursor-pointer">
+                <!-- RESULTADO DE LA VALIDACIÓN -->
+                <div id="result-box" class="hidden p-6 rounded-3xl text-center border transition-all shadow-2xl transform scale-95">
+                    <p id="result-title" class="text-2xl font-extrabold tracking-tight"></p>
+                    <p id="result-name" class="text-xl font-bold mt-3 text-white"></p>
+                    <p id="result-details" class="text-xs mt-2 opacity-90"></p>
+                    <button onclick="reiniciarEscanner()" class="mt-6 bg-white/20 hover:bg-white/30 text-white px-5 py-2.5 rounded-full text-xs font-semibold transition flex items-center gap-1 mx-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                        Escanear Siguiente
+                    </button>
                 </div>
             </div>
 
-            <!-- ESCANER DE CÁMARA -->
-            <div class="bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-700 shadow-xl text-center">
-                <h2 class="text-sm sm:text-md font-medium text-slate-300 mb-2">Escanear Código QR</h2>
-                <div id="reader" class="w-full rounded overflow-hidden border border-slate-700"></div>
+            <!-- COLUMNA DERECHA: ESCÁNER -->
+            <div class="lg:col-span-2 order-1 lg:order-2">
+                <div class="bg-bolivia-blue p-5 rounded-3xl shadow-2xl border border-slate-700 flex flex-col items-center">
+                    <div class="w-full flex items-center justify-between mb-4 border-b border-slate-600 pb-4">
+                        <h3 class="text-lg font-bold text-white tracking-tight">Escáner de Código QR</h3>
+                        <span class="text-[10px] font-mono bg-slate-900 px-2.5 py-1 rounded-full text-bolivia-cyan">Cámara Trasera</span>
+                    </div>
+                    
+                    <!-- Contenedor del Escáner (cuadrado responsivo) -->
+                    <div id="reader" class="w-full max-w-sm aspect-square rounded-3xl overflow-hidden border-4 border-bolivia-cyan/40 bg-black shadow-inner relative">
+                        <!-- Overlay de guía de escaneo -->
+                        <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                            <div class="w-2/3 h-2/3 border-2 border-dashed border-bolivia-gold/70 rounded-3xl"></div>
+                        </div>
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 bg-bolivia-gold text-bg-dark text-[10px] font-bold px-3 py-1 rounded-b-lg z-20">
+                            ENFOQUE EL CÓDIGO QR
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- RESULTADO DE LA VALIDACIÓN -->
-            <div id="result-box" class="hidden p-4 rounded-xl text-center border transition-all">
-                <p id="result-title" class="text-base sm:text-lg font-bold"></p>
-                <p id="result-name" class="text-lg sm:text-xl font-semibold mt-1"></p>
-                <p id="result-details" class="text-xs sm:text-sm mt-2"></p>
-                <button onclick="reiniciarEscanner()" class="mt-4 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-xs sm:text-sm">Escanear Siguiente</button>
-            </div>
         </div>
     </main>
 
     <!-- FOOTER -->
-    <footer class="text-center py-3 text-xs text-slate-500 border-t border-slate-800">
-        Sistema Seguro anti-duplicados • PROFE
+    <footer class="bg-bolivia-blue border-t border-slate-700 text-center py-2 text-[9px] text-slate-400 z-50">
+        © 2026 Programa PROFE - Ministerio de Educación - Estado Plurinacional de Bolivia
     </footer>
 
-    <!-- SCRIPT DE FIREBASE REALTIME DATABASE Y LÓGICA -->
+    <!-- LÓGICA FIREBASE (REALTIME DATABASE) Y APLICACIÓN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, get, update, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // ==========================================
         // CREDENCIALES OFICIALES DE FIREBASE
@@ -112,67 +172,129 @@
 
         let html5QrCode = null;
         let scannerIsRunning = false;
+        let lastResult, countResults = 0;
 
-        // Login de Administrador
+        // --- LOGIN / AUTENTICACIÓN ---
         window.handleLogin = async function(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
             const errorElement = document.getElementById('login-error');
+            const loginBtn = e.target.querySelector('button');
 
             try {
                 errorElement.classList.add('hidden');
+                loginBtn.textContent = "Validando...";
+                loginBtn.disabled = true;
+
                 await signInWithEmailAndPassword(auth, email, password);
+                // Al iniciar sesión, onAuthStateChanged ocultará el login y mostrará la app
             } catch (error) {
-                errorElement.textContent = "Error: Credenciales incorrectas.";
+                console.error(error);
+                errorElement.textContent = "Correo o contraseña incorrectos.";
                 errorElement.classList.remove('hidden');
+            } finally {
+                loginBtn.textContent = "Ingresar al Sistema";
+                loginBtn.disabled = false;
             }
         };
 
-        // Cerrar Sesión
         window.cerrarSesion = function() {
-            signOut(auth);
+            if (confirm("¿Cerrar sesión de administrador?")) {
+                signOut(auth);
+            }
         };
 
-        // Control de Estado de Sesión
+        // Escuchar cambios de estado de autenticación
         onAuthStateChanged(auth, (user) => {
+            const loginSection = document.getElementById('login-section');
+            const appSection = document.getElementById('app-section');
+            const userInfo = document.getElementById('user-info');
+            const userEmailSpan = document.getElementById('user-email');
+
             if (user) {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('app-section').classList.remove('hidden');
-                document.getElementById('user-info').classList.remove('hidden');
-                document.getElementById('user-email').textContent = user.email;
+                // Sesión activa: Ocultar login, mostrar app
+                loginSection.classList.add('hidden');
+                appSection.classList.remove('hidden');
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+                userEmailSpan.textContent = user.email;
                 iniciarEscanner();
             } else {
-                document.getElementById('login-section').classList.remove('hidden');
-                document.getElementById('app-section').classList.add('hidden');
-                document.getElementById('user-info').classList.add('hidden');
+                // Sesión cerrada: Mostrar login, ocultar app
+                loginSection.classList.remove('hidden');
+                appSection.classList.add('hidden');
+                userInfo.classList.add('hidden');
+                userInfo.classList.remove('flex');
                 
                 if (scannerIsRunning && html5QrCode) {
-                    html5QrCode.stop().then(() => { scannerIsRunning = false; }).catch(err => console.log(err));
+                    html5QrCode.stop().then(() => {
+                        scannerIsRunning = false;
+                        document.getElementById('reader').innerHTML = '<div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"><div class="w-2/3 h-2/3 border-2 border-dashed border-bolivia-gold/70 rounded-3xl"></div></div><div class="absolute top-0 left-1/2 -translate-x-1/2 bg-bolivia-gold text-bg-dark text-[10px] font-bold px-3 py-1 rounded-b-lg z-20">ENFOQUE EL CÓDIGO QR</div>';
+                    }).catch(err => console.log("Error al detener escáner", err));
                 }
             }
         });
 
-        // Inicializar Escáner QR
+        // --- ESCÁNER QR ---
+        function onScanSuccess(decodedText, decodedResult) {
+            // Prevenir escaneos múltiples del mismo código
+            if (decodedText !== lastResult) {
+                lastResult = decodedText;
+                // Pausar escáner inmediatamente tras lectura exitosa
+                if (scannerIsRunning) {
+                    html5QrCode.pause();
+                    scannerIsRunning = false;
+                }
+                verificarYEntregarRefrigerio(decodedText.trim());
+            }
+        }
+
         function iniciarEscanner() {
             if (scannerIsRunning) return;
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+            
+            // Configuración del lector QR
+            const config = {
+                fps: 5, // Frames por segundo (menor es más estable en móviles)
+                qrbox: { width: 220, height: 220 }, // Tamaño del área de escaneo
+                aspectRatio: 1.0, // Forzar formato cuadrado
+                videoConstraints: {
+                    facingMode: "environment" // Forzar cámara trasera
+                }
+            };
+
+            // Crear instancia si no existe
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
+            }
 
             html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-                .then(() => { scannerIsRunning = true; })
-                .catch(err => console.log("Error cámara: ", err));
+                .then(() => {
+                    scannerIsRunning = true;
+                })
+                .catch(err => {
+                    console.error("Error al iniciar la cámara: ", err);
+                    document.getElementById('reader').innerHTML = `<div class="flex items-center justify-center h-full p-4 text-center text-red-300 text-xs bg-red-950/50 rounded-3xl">
+                        ❌ Error al acceder a la cámara.<br>
+                        Asegúrese de dar permisos desde la configuración de su navegador.<br>
+                        Error técnico: ${err}
+                    </div>`;
+                });
         }
 
-        async function onScanSuccess(decodedText) {
-            if (scannerIsRunning && html5QrCode) {
-                await html5QrCode.pause();
-                scannerIsRunning = false;
+        window.reiniciarEscanner = function() {
+            const resultBox = document.getElementById('result-box');
+            resultBox.classList.add('hidden');
+            resultBox.classList.remove('bg-emerald-950', 'border-emerald-600', 'bg-red-950', 'border-red-600');
+            
+            if (html5QrCode && !scannerIsRunning) {
+                lastResult = undefined; // Permitir volver a escanear el mismo código
+                html5QrCode.resume();
+                scannerIsRunning = true;
             }
-            verificarYEntregarRefrigerio(decodedText.trim());
-        }
+        };
 
-        // Lógica de Validación y Anti-Duplicados (Realtime Database)
+        // --- LÓGICA DE DATOS (REALTIME DATABASE) ---
         async function verificarYEntregarRefrigerio(id) {
             const resultBox = document.getElementById('result-box');
             const resultTitle = document.getElementById('result-title');
@@ -180,58 +302,65 @@
             const resultDetails = document.getElementById('result-details');
 
             resultBox.classList.remove('hidden', 'bg-emerald-950', 'border-emerald-600', 'bg-red-950', 'border-red-600');
+            resultTitle.textContent = "Consultando...";
+            resultName.textContent = id;
+            resultDetails.textContent = "Verificando en el padrón...";
+            resultBox.classList.add('bg-slate-800', 'border-slate-600', 'text-slate-300');
 
             try {
+                // Referencia al participante específico en la base de datos
                 const participanteRef = ref(db, 'participantes/' + id);
                 const snapshot = await get(participanteRef);
 
+                resultBox.classList.remove('bg-slate-800', 'border-slate-600', 'text-slate-300');
+
                 if (!snapshot.exists()) {
-                    resultBox.classList.add('bg-red-950', 'border-red-600');
+                    // CÓDIGO QR INVÁLIDO (No existe en BBDD)
+                    resultBox.classList.add('bg-red-950', 'border-red-600', 'text-red-100');
                     resultTitle.textContent = "❌ CÓDIGO INVÁLIDO";
                     resultName.textContent = `ID: ${id}`;
-                    resultDetails.textContent = "Este código QR no se encuentra registrado en el padrón.";
+                    resultDetails.textContent = "Este código QR no se encuentra registrado en el padrón oficial.";
                 } else {
                     const data = snapshot.val();
 
                     if (data.entregado === true) {
-                        resultBox.classList.add('bg-red-950', 'border-red-600');
+                        // ENTREGA DOBLE (Ya se entregó anteriormente)
+                        resultBox.classList.add('bg-amber-950', 'border-yellow-600', 'text-yellow-100');
                         resultTitle.textContent = "⚠️ ¡ALERTA: ENTREGA DOBLE!";
-                        resultName.textContent = data.nombre || "Sin Nombre";
+                        resultName.textContent = data.nombre || "Participante Registrado";
                         resultDetails.textContent = `Ya retiró su refrigerio a las: ${data.horaEntrega || '---'}.`;
                     } else {
-                        const horaActual = new Date().toLocaleTimeString();
+                        // ENTREGA AUTORIZADA (Existe y no ha retirado)
+                        const horaActual = new Date().toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+                        
+                        // Actualizar registro: marcar entregado y guardar hora
                         await update(participanteRef, {
                             entregado: true,
                             horaEntrega: horaActual
                         });
 
-                        resultBox.classList.add('bg-emerald-950', 'border-emerald-600');
+                        resultBox.classList.add('bg-emerald-950', 'border-emerald-600', 'text-emerald-100');
                         resultTitle.textContent = "✅ ¡REFRIGERIO AUTORIZADO!";
-                        resultName.textContent = data.nombre || "Participante";
-                        resultDetails.textContent = `Registrado con éxito a las ${horaActual}.`;
+                        resultName.textContent = data.nombre || "Participante Registrado";
+                        resultDetails.textContent = `Registrado con éxito a las ${horaActual} Hrs.`;
                     }
                 }
             } catch (error) {
-                resultBox.classList.add('bg-red-950', 'border-red-600');
-                resultTitle.textContent = "❌ ERROR";
+                // ERROR TÉCNICO DE CONEXIÓN
+                console.error("Error en base de datos:", error);
+                resultBox.classList.add('bg-red-950', 'border-red-600', 'text-red-100');
+                resultTitle.textContent = "❌ ERROR TÉCNICO";
                 resultName.textContent = "Error al procesar";
-                resultDetails.textContent = error.message;
+                resultDetails.textContent = "Hubo un problema de conexión con la base de datos. Inténtelo de nuevo.";
             }
         }
 
-        window.reiniciarEscanner = function() {
-            document.getElementById('result-box').classList.add('hidden');
-            if (html5QrCode && !scannerIsRunning) {
-                html5QrCode.resume();
-                scannerIsRunning = true;
-            }
-        };
-
-        // Descargar Plantilla Excel de Ejemplo
+        // --- GESTIÓN DE PADRÓN (EXCEL) ---
         window.descargarPlantillaExcel = function() {
+            // Generar y descargar archivo de ejemplo con formato correcto
             const templateData = [
-                { id: "5637347", nombre: "GISBERT MAMANI CINTIA VERONICA" },
-                { id: "14122404", nombre: "VALENCIA CATARI JUAN PABLO" }
+                { id: "7654321", nombre: "QUISPE MAMANI, CARLOS" },
+                { id: "1234567", nombre: "MOLINA VARGAS, ANA" }
             ];
             const worksheet = XLSX.utils.json_to_sheet(templateData);
             const workbook = XLSX.utils.book_new();
@@ -239,54 +368,101 @@
             XLSX.writeFile(workbook, "plantilla_participantes_profe.xlsx");
         };
 
-        // Carga Masiva de Excel a Realtime Database
         window.procesarExcel = function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
+            const btn = event.target.nextElementSibling; // Label
+            const originalText = btn.textContent;
+
             const reader = new FileReader();
             reader.onload = async function(e) {
                 try {
+                    btn.textContent = "Procesando archivo...";
+                    btn.classList.add('opacity-50');
+
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Obtener primera hoja
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    // Convertir a JSON. {defval:""} asegura que celdas vacías sean cadenas vacías
                     const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
                     if (jsonRows.length === 0) {
-                        alert("El archivo Excel está vacío.");
+                        alert("El archivo Excel está vacío o no tiene cabeceras reconocibles.");
                         return;
                     }
 
-                    let contador = 0;
-                    for (let row of jsonRows) {
-                        let idVal = String(row.id || row.C_I || row.CI || row.carnet || "").trim();
-                        let nombreVal = String(row.nombre || row.Nombres || "").trim();
+                    if (!confirm(`Se encontraron ${jsonRows.length} registros en el Excel. ¿Desea subirlos a la base de datos? (Esto sobrescribirá los datos existentes)`)) {
+                        event.target.value = "";
+                        btn.textContent = originalText;
+                        btn.classList.remove('opacity-50');
+                        return;
+                    }
 
+                    // Importación por Lotes (Batch Write - Optimizada para Realtime DB)
+                    let updates = {};
+                    let contador = 0;
+
+                    for (let row of jsonRows) {
+                        let idVal = "";
+                        let nombreVal = "";
+
+                        // Detección flexible de columnas (id, ci, documento, nombres, nombre)
+                        for (let key in row) {
+                            const kLower = key.toLowerCase().trim();
+                            if (kLower === 'id' || kLower === 'ci' || kLower === 'documento' || kLower === 'cedula') {
+                                idVal = String(row[key]).trim();
+                            } else if (kLower === 'nombre' || kLower === 'nombres' || kLower === 'nombre completo') {
+                                nombreVal = String(row[key]).trim();
+                            }
+                        }
+
+                        // Validar campos obligatorios
                         if (idVal && idVal !== "nan" && nombreVal && nombreVal !== "nan") {
-                            const participanteRef = ref(db, 'participantes/' + idVal);
-                            await set(participanteRef, {
+                            updates['participantes/' + idVal] = {
                                 nombre: nombreVal,
                                 entregado: false,
                                 horaEntrega: ""
-                            });
+                            };
                             contador++;
                         }
                     }
 
-                    alert(`¡Carga exitosa! Se registraron ${contador} participantes en Firebase.`);
-                    document.getElementById('excel-file').value = "";
+                    if (contador === 0) {
+                        alert("No se encontraron registros válidos. Verifique que las columnas coincidan con la plantilla (id, nombre).");
+                        return;
+                    }
+
+                    // Ejecutar actualización masiva
+                    await update(ref(db), updates);
+                    alert(`¡Carga exitosa! Se han cargado ${contador} participantes a la base de datos.`);
+                    event.target.value = ""; // Resetear input
+
                 } catch (error) {
                     console.error("Error detallado:", error);
-                    alert("Error al guardar en Firebase: " + error.message);
+                    alert("Error al procesar el archivo o guardar en Firebase: " + error.message);
+                } finally {
+                    btn.textContent = originalText;
+                    btn.classList.remove('opacity-50');
                 }
             };
             reader.readAsArrayBuffer(file);
         };
 
-        // Reiniciar Jornada Diaria
         window.confirmarReinicio = async function() {
-            if (!confirm("¿Reiniciar registros para un nuevo día?")) return;
+            if (!confirm("⚠️ ATENCIÓN: ¿Está seguro de reiniciar la jornada? Esto marcará a TODOS los participantes como 'NO RETIRADO' y borrará las horas de entrega. ESTA ACCIÓN NO SE PUEDE DESHACER.")) return;
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+
             try {
+                btn.textContent = "Reiniciando...";
+                btn.disabled = true;
+
                 const participantesRef = ref(db, 'participantes');
                 const snapshot = await get(participantesRef);
                 
@@ -299,13 +475,19 @@
                         updates[`participantes/${key}/horaEntrega`] = "";
                         count++;
                     });
+                    
+                    // Ejecutar actualización masiva para resetear el día
                     await update(ref(db), updates);
-                    alert(`¡Jornada reiniciada! ${count} participantes habilitados.`);
+                    alert(`¡Jornada reiniciada exitosamente! Se han habilitado nuevamente ${count} participantes.`);
                 } else {
-                    alert("No hay participantes registrados.");
+                    alert("No hay participantes registrados para reiniciar.");
                 }
             } catch (error) {
-                alert("Error al reiniciar: " + error.message);
+                console.error(error);
+                alert("Error al reiniciar el día: " + error.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
             }
         };
     </script>
