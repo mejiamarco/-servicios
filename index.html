@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-slate-950">
+<html lang="es" class="h-full bg-black">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -15,115 +15,127 @@
             theme: {
                 extend: {
                     colors: {
-                        'bolivia-blue': '#1E293B',
-                        'bolivia-cyan': '#0EA5E9',
-                        'bolivia-gold': '#FBBF24', // Dorado institucional
-                        'bg-dark': '#0F172A',
+                        'neo-black': '#09090b',    // Negro profundo
+                        'neo-grey': '#18181b',     // Plomo oscuro base
+                        'neo-silver': '#a1a1aa',   // Plomo texto secundario
+                        'neo-gold': '#D4AF37',     // Dorado metálico
+                        'neo-gold-light': '#FBBF24',// Dorado brillante
                     }
                 }
             }
         }
     </script>
+    <style>
+        /* Efecto Neón Tricolor (Rojo, Amarillo, Verde) para el marco del escáner */
+        .neon-tricolor-border {
+            border: 3px solid transparent;
+            border-image: linear-gradient(135deg, #ef4444, #eab308, #22c55e) 1;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4), 
+                        0 0 30px rgba(234, 179, 8, 0.4), 
+                        0 0 45px rgba(34, 197, 94, 0.4);
+        }
+    </style>
 </head>
-<body class="h-full font-sans text-slate-100 flex flex-col antialiased">
+<body class="h-full font-sans text-slate-100 flex flex-col antialiased bg-black">
 
-    <!-- HEADER RESPONSIVO -->
-    <header class="bg-bolivia-blue border-b border-slate-700 shadow-lg p-3 flex justify-between items-center gap-4 z-50 sticky top-0">
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="bg-neo-black border-b border-zinc-800 shadow-xl p-3 flex justify-between items-center gap-4 z-50 sticky top-0">
         <div class="flex items-center gap-3">
             <img src="escudo.png" alt="Escudo de Bolivia" class="h-10 w-auto object-contain" onerror="this.style.display='none';">
             <div>
-                <h1 class="text-xs font-bold text-white tracking-wider">MINISTERIO DE EDUCACIÓN</h1>
-                <p class="text-[9px] text-slate-300">ESTADO PLURINACIONAL DE BOLIVIA</p>
+                <h1 class="text-[11px] font-bold text-zinc-300 tracking-wider">MINISTERIO DE EDUCACIÓN</h1>
+                <p class="text-[8px] text-zinc-500 uppercase">Estado Plurinacional de Bolivia</p>
             </div>
-            <div class="hidden sm:block border-l pl-3 border-slate-600">
-                <span class="text-xs font-bold text-bolivia-gold tracking-widest">PROFE</span>
-                <span class="text-[10px] text-slate-300 block">Control de Refrigerios</span>
+            <div class="hidden sm:block border-l pl-3 border-zinc-800">
+                <span class="text-xs font-black text-neo-gold tracking-widest drop-shadow">PROFE</span>
+                <span class="text-[9px] text-zinc-400 block">Control de Refrigerios</span>
             </div>
         </div>
         
-        <div id="user-info" class="text-sm text-slate-300 hidden items-center gap-3">
-            <span id="user-email" class="text-slate-100 font-medium text-xs truncate max-w-[120px]"></span> 
-            <button onclick="cerrarSesion()" class="bg-red-800/70 hover:bg-red-700 text-red-100 px-3 py-1.5 rounded-full text-[10px] font-semibold transition">Salir</button>
+        <div id="user-info" class="text-sm text-zinc-300 hidden items-center gap-3">
+            <span id="user-email" class="text-zinc-200 font-medium text-xs truncate max-w-[120px]"></span> 
+            <button onclick="cerrarSesion()" class="bg-zinc-800 hover:bg-red-950/80 text-red-400 border border-zinc-700 hover:border-red-800 px-3 py-1.5 rounded-full text-[10px] font-semibold transition">Salir</button>
         </div>
     </header>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-grow p-4 sm:p-6 flex flex-col items-center justify-center bg-bg-dark">
+    <main class="flex-grow p-4 sm:p-6 flex flex-col items-center justify-center bg-black">
 
         <!-- PANTALLA 1: LOGIN ADMINISTRADOR -->
-        <div id="login-section" class="bg-slate-900 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-800 transition-all duration-500">
+        <div id="login-section" class="bg-neo-grey p-8 rounded-3xl shadow-2xl w-full max-w-md border border-zinc-800 transition-all duration-500">
             <div class="mb-8 text-center">
-                <div class="text-4xl font-extrabold text-bolivia-gold mb-1 tracking-tight drop-shadow">PROFE</div>
-                <p class="text-xs text-slate-300 font-semibold uppercase tracking-wider">Programa de Formación Especializada</p>
-                <p class="text-[11px] text-slate-400 mt-1">Panel de Control Seguro</p>
+                <div class="text-4xl font-black text-neo-gold mb-1 tracking-tight drop-shadow-md">PROFE</div>
+                <p class="text-[11px] text-zinc-400 font-semibold uppercase tracking-widest">Programa de Formación Especializada</p>
+                <div class="w-12 h-0.5 bg-neo-gold mx-auto mt-2"></div>
             </div>
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Correo Administrador</label>
-                    <input type="email" id="email" required placeholder="admin@minedu.gob.bo" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white text-sm focus:ring-2 focus:ring-bolivia-gold focus:border-bolivia-gold outline-none transition">
+                    <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Correo Administrador</label>
+                    <input type="email" id="email" required placeholder="admin@minedu.gob.bo" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm focus:ring-2 focus:ring-neo-gold focus:border-neo-gold outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Contraseña</label>
-                    <input type="password" id="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white text-sm focus:ring-2 focus:ring-bolivia-gold focus:border-bolivia-gold outline-none transition">
+                    <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Contraseña</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm focus:ring-2 focus:ring-neo-gold focus:border-neo-gold outline-none transition">
                 </div>
-                <button type="submit" class="w-full bg-bolivia-gold hover:bg-amber-400 text-slate-950 font-extrabold p-3.5 rounded-xl text-sm transition duration-300 shadow-lg">Ingresar al Sistema</button>
+                <button type="submit" class="w-full bg-neo-gold hover:bg-neo-gold-light text-black font-black p-3.5 rounded-xl text-sm transition duration-300 shadow-lg">Ingresar al Sistema</button>
                 <p id="login-error" class="text-red-400 text-xs text-center hidden mt-2"></p>
             </form>
         </div>
 
-        <!-- PANTALLA 2: APLICACIÓN (ESCANER Y GESTIÓN) -->
+        <!-- PANTALLA 2: APLICACIÓN (ESTÉTICA PLOMO / NEGRO / DORADO / NEÓN) -->
         <div id="app-section" class="hidden w-full max-w-4xl grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-500">
             
             <!-- COLUMNA IZQUIERDA: ADMINISTRACIÓN -->
             <div class="lg:col-span-1 space-y-5 order-2 lg:order-1">
-                <div class="bg-bolivia-blue p-5 rounded-3xl shadow-xl border border-slate-700 space-y-4">
-                    <h3 class="text-xs font-extrabold text-bolivia-gold uppercase tracking-widest flex items-center gap-2">
-                        <span>⚡</span> GESTIÓN Y REPORTES
+                <div class="bg-neo-grey p-5 rounded-3xl shadow-2xl border border-zinc-800 space-y-4">
+                    <h3 class="text-xs font-black text-neo-gold uppercase tracking-widest flex items-center gap-2">
+                        <span>⚡</span> PANEL DE CONTROL
                     </h3>
                     
                     <div class="grid grid-cols-1 gap-2.5">
-                        <button onclick="descargarPlantillaExcel()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs py-2.5 px-3 rounded-xl border border-slate-600 transition flex items-center justify-center gap-2 font-medium">
+                        <button onclick="descargarPlantillaExcel()" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs py-2.5 px-3 rounded-xl border border-zinc-700 transition flex items-center justify-center gap-2 font-medium">
                             📥 Descargar Plantilla Excel
                         </button>
-                        <button onclick="descargarReporteExcel()" class="bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 text-xs py-2.5 px-3 rounded-xl border border-emerald-800 transition flex items-center justify-center gap-2 font-medium">
+                        <button onclick="descargarReporteExcel()" class="bg-zinc-900 hover:bg-emerald-950/40 text-emerald-400 text-xs py-2.5 px-3 rounded-xl border border-zinc-700 hover:border-emerald-800 transition flex items-center justify-center gap-2 font-medium">
                             📊 Reporte de Entregas
                         </button>
-                        <button onclick="confirmarReinicio()" class="bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 text-xs py-2.5 px-3 rounded-xl border border-amber-800 transition flex items-center justify-center gap-2 font-medium">
+                        <button onclick="confirmarReinicio()" class="bg-zinc-900 hover:bg-amber-950/40 text-amber-400 text-xs py-2.5 px-3 rounded-xl border border-zinc-700 hover:border-amber-800 transition flex items-center justify-center gap-2 font-medium">
                             🔄 Reiniciar Jornada
                         </button>
                     </div>
 
                     <!-- CARGA DE EXCEL -->
-                    <div class="pt-3 border-t border-slate-600">
-                        <label class="block text-xs text-slate-300 font-medium mb-1.5">Cargar Padrón (.xlsx, .csv):</label>
-                        <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="procesarExcel(event)" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-bolivia-gold file:text-slate-950 hover:file:bg-amber-400 cursor-pointer bg-slate-800 rounded-xl p-1.5 border border-slate-700">
+                    <div class="pt-3 border-t border-zinc-800">
+                        <label class="block text-xs text-zinc-300 font-medium mb-1.5">Cargar Padrón (.xlsx, .csv):</label>
+                        <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="procesarExcel(event)" class="w-full text-xs text-zinc-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neo-gold file:text-black hover:file:bg-neo-gold-light cursor-pointer bg-zinc-950 rounded-xl p-1.5 border border-zinc-800">
                     </div>
                 </div>
 
                 <!-- RESULTADO DE LA VALIDACIÓN -->
                 <div id="result-box" class="hidden p-5 rounded-3xl text-center border transition-all shadow-2xl">
-                    <p id="result-title" class="text-xl font-extrabold tracking-tight"></p>
+                    <p id="result-title" class="text-xl font-black tracking-tight"></p>
                     <p id="result-name" class="text-base font-bold mt-2 text-white"></p>
                     <p id="result-details" class="text-xs mt-1 opacity-90"></p>
-                    <button onclick="reiniciarEscanner()" class="mt-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-xs font-semibold transition mx-auto flex items-center gap-1">
+                    <button onclick="reiniciarEscanner()" class="mt-4 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-600 px-4 py-2 rounded-full text-xs font-semibold transition mx-auto flex items-center gap-1">
                         Escanear Siguiente
                     </button>
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: ESCÁNER -->
+            <!-- COLUMNA DERECHA: ESCÁNER CON MARCO NEÓN TRICOLOR -->
             <div class="lg:col-span-2 order-1 lg:order-2">
-                <div class="bg-bolivia-blue p-5 rounded-3xl shadow-2xl border border-slate-700 flex flex-col items-center">
-                    <div class="w-full flex items-center justify-between mb-3 border-b border-slate-600 pb-3">
+                <div class="bg-neo-grey p-5 rounded-3xl shadow-2xl border border-zinc-800 flex flex-col items-center">
+                    <div class="w-full flex items-center justify-between mb-3 border-b border-zinc-800 pb-3">
                         <h3 class="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                            <span class="text-bolivia-gold">📷</span> Escáner de Código QR
+                            <span class="text-neo-gold">📷</span> Escáner de Código QR
                         </h3>
-                        <span class="text-[10px] font-mono bg-slate-900 px-2.5 py-1 rounded-full text-bolivia-gold border border-slate-700">Cámara Trasera</span>
+                        <span class="text-[10px] font-mono bg-zinc-950 px-2.5 py-1 rounded-full text-neo-gold border border-zinc-800">Cámara Trasera Activa</span>
                     </div>
                     
-                    <div id="reader" class="w-full max-w-xs aspect-square rounded-2xl overflow-hidden border-2 border-bolivia-gold/50 bg-black shadow-inner relative">
+                    <!-- Contenedor con borde neón tricolor (Rojo, Amarillo, Verde) -->
+                    <div id="reader" class="w-full max-w-xs aspect-square rounded-2xl overflow-hidden neon-tricolor-border bg-black shadow-inner relative">
                         <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                            <div class="w-3/4 h-3/4 border-2 border-dashed border-bolivia-gold/80 rounded-2xl"></div>
+                            <div class="w-3/4 h-3/4 border-2 border-dashed border-neo-gold/80 rounded-xl"></div>
                         </div>
                     </div>
                 </div>
@@ -133,15 +145,15 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-bolivia-blue border-t border-slate-700 text-center py-2 text-[10px] text-slate-400 z-50">
-        © 2026 Programa <span class="text-bolivia-gold font-bold">PROFE</span> - Ministerio de Educación - Estado Plurinacional de Bolivia
+    <footer class="bg-neo-black border-t border-zinc-800 text-center py-2.5 text-[10px] text-zinc-400 z-50">
+        © 2026 Programa <span class="text-neo-gold font-bold">PROFE</span> - Ministerio de Educación - Estado Plurinacional de Bolivia
     </footer>
 
-    <!-- SCRIPT DE FIREBASE Y LÓGICA -->
+    <!-- SCRIPT DE FIREBASE Y LÓGICA DE CONCURRENCIA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, get, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCYL6LrCODSyctVDYlde8PilNmSfM_fqb4",
@@ -230,7 +242,7 @@
             if (scannerIsRunning) return;
             const config = {
                 fps: 5,
-                qrbox: { width: 200, height: 200 },
+                qrbox: { width: 190, height: 190 },
                 aspectRatio: 1.0,
                 videoConstraints: { facingMode: "environment" }
             };
@@ -256,6 +268,7 @@
             }
         };
 
+        // Lógica de Concurrencia Atómica contra Doble Entrega simultánea
         async function verificarYEntregarRefrigerio(id) {
             const resultBox = document.getElementById('result-box');
             const resultTitle = document.getElementById('result-title');
@@ -265,45 +278,61 @@
             resultBox.classList.remove('hidden', 'bg-emerald-950', 'border-emerald-600', 'bg-red-950', 'border-red-600', 'bg-amber-950');
             resultTitle.textContent = "Verificando...";
             resultName.textContent = id;
-            resultDetails.textContent = "Buscando en la base de datos...";
-            resultBox.classList.add('bg-slate-800', 'border-slate-600', 'text-slate-300');
+            resultDetails.textContent = "Sincronizando en tiempo real...";
+            resultBox.classList.add('bg-zinc-900', 'border-zinc-700', 'text-zinc-300');
 
             try {
                 const participanteRef = ref(db, 'participantes/' + id);
-                const snapshot = await get(participanteRef);
+                let resultadoOperacion = null;
+                let nombreParticipante = "";
+                let horaGuardada = "";
 
-                resultBox.classList.remove('bg-slate-800', 'border-slate-600', 'text-slate-300');
+                await runTransaction(participanteRef, (currentData) => {
+                    if (!currentData) {
+                        resultadoOperacion = "no_existe";
+                        return;
+                    }
 
-                if (!snapshot.exists()) {
+                    if (currentData.entregado === true) {
+                        resultadoOperacion = "ya_entregado";
+                        nombreParticipante = currentData.nombre;
+                        horaGuardada = currentData.horaEntrega;
+                        return;
+                    }
+
+                    const horaActual = new Date().toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+                    currentData.entregado = true;
+                    currentData.horaEntrega = horaActual;
+                    nombreParticipante = currentData.nombre;
+                    horaGuardada = horaActual;
+                    resultadoOperacion = "exito";
+                    
+                    return currentData;
+                });
+
+                resultBox.classList.remove('bg-zinc-900', 'border-zinc-700', 'text-zinc-300');
+
+                if (resultadoOperacion === "no_existe") {
                     resultBox.classList.add('bg-red-950', 'border-red-600', 'text-red-100');
                     resultTitle.textContent = "❌ CÓDIGO INVÁLIDO";
                     resultName.textContent = `ID: ${id}`;
                     resultDetails.textContent = "Este código QR no pertenece al padrón oficial.";
-                } else {
-                    const data = snapshot.val();
-
-                    if (data.entregado === true) {
-                        resultBox.classList.add('bg-amber-950', 'border-yellow-600', 'text-yellow-100');
-                        resultTitle.textContent = "⚠️ ¡ENTREGA DOBLE!";
-                        resultName.textContent = data.nombre || "Participante";
-                        resultDetails.textContent = `Ya retiró su refrigerio a las: ${data.horaEntrega || '---'}.`;
-                    } else {
-                        const horaActual = new Date().toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
-                        await update(participanteRef, {
-                            entregado: true,
-                            horaEntrega: horaActual
-                        });
-
-                        resultBox.classList.add('bg-emerald-950', 'border-emerald-600', 'text-emerald-100');
-                        resultTitle.textContent = "✅ ¡AUTORIZADO!";
-                        resultName.textContent = data.nombre || "Participante";
-                        resultDetails.textContent = `Refrigerio entregado a las ${horaActual} Hrs.`;
-                    }
+                } else if (resultadoOperacion === "ya_entregado") {
+                    resultBox.classList.add('bg-amber-950', 'border-yellow-600', 'text-yellow-100');
+                    resultTitle.textContent = "⚠️ ¡ENTREGA DOBLE BLOQUEADA!";
+                    resultName.textContent = nombreParticipante || "Participante";
+                    resultDetails.textContent = `Este refrigerio ya fue retirado a las ${horaGuardada || '---'} Hrs.`;
+                } else if (resultadoOperacion === "exito") {
+                    resultBox.classList.add('bg-emerald-950', 'border-emerald-600', 'text-emerald-100');
+                    resultTitle.textContent = "✅ ¡AUTORIZADO!";
+                    resultName.textContent = nombreParticipante || "Participante";
+                    resultDetails.textContent = `Refrigerio entregado a las ${horaGuardada} Hrs.`;
                 }
+
             } catch (error) {
                 resultBox.classList.add('bg-red-950', 'border-red-600', 'text-red-100');
                 resultTitle.textContent = "❌ ERROR";
-                resultName.textContent = "Fallo de conexión";
+                resultName.textContent = "Fallo de concurrencia";
                 resultDetails.textContent = error.message;
             }
         }
@@ -319,7 +348,6 @@
             XLSX.writeFile(workbook, "plantilla_participantes_profe.xlsx");
         };
 
-        // Descargar Reporte Completo de Entregas
         window.descargarReporteExcel = async function() {
             try {
                 const participantesRef = ref(db, 'participantes');
