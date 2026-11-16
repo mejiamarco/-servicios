@@ -1,160 +1,100 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-slate-100">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Control PROFE - Sistema de Refrigerios</title>
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Refrigerios - PROFE</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Librería HTML5 QR Code para la cámara -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <!-- Librería SheetJS (XLSX) para Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'app-bg': '#F1F5F9',
-                        'app-card': '#FFFFFF',
-                        'app-gold': '#C59B27',
-                        'app-gold-hover': '#A6801D',
-                        'app-dark': '#0F172A',
-                        'app-gray': '#64748B'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Marco de escaneo con neones tricolor (Rojo, Amarillo, Verde) */
-        .neon-tricolor-border {
-            border: 4px solid transparent;
-            border-image: linear-gradient(135deg, #ef4444, #eab308, #22c55e) 1;
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.4), 
-                        0 0 25px rgba(234, 179, 8, 0.4), 
-                        0 0 35px rgba(34, 197, 94, 0.4);
-        }
-    </style>
 </head>
-<body class="h-full font-sans text-slate-800 flex flex-col antialiased bg-app-bg">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
 
-    <!-- HEADER INSTITUCIONAL MÓVIL / PC -->
-    <header class="bg-white border-b border-slate-200 shadow-sm px-4 py-3 flex justify-between items-center z-50 sticky top-0">
-        <div class="flex items-center gap-2.5">
-            <img src="escudo.png" alt="Escudo" class="h-8 w-auto object-contain" onerror="this.style.display='none';">
-            <div>
-                <h1 class="text-[10px] font-extrabold text-slate-900 tracking-wider leading-tight">MINISTERIO DE EDUCACIÓN</h1>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="text-xs font-black text-app-gold tracking-widest">PROFE</span>
-                    <span class="text-[9px] text-slate-500 font-medium">| Control QR</span>
-                </div>
-            </div>
-        </div>
-        
-        <div id="user-info" class="hidden items-center gap-2">
-            <span id="user-email" class="text-slate-700 font-semibold text-[11px] truncate max-w-[100px] sm:max-w-[150px]"></span> 
-            <button onclick="cerrarSesion()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2.5 py-1 rounded-full text-[10px] font-bold transition">Salir</button>
+    <!-- HEADER RESPONSIVO -->
+    <header class="bg-slate-800 border-b border-slate-700 p-3 sm:p-4 shadow-md flex flex-wrap justify-between items-center gap-2">
+        <h1 class="text-base sm:text-lg font-bold text-cyan-400">Control de Refrigerios PROFE</h1>
+        <div id="user-info" class="text-xs sm:text-sm text-slate-400 hidden flex items-center gap-2 sm:gap-3">
+            <span id="user-email" class="text-slate-300 truncate max-w-[150px] sm:max-w-xs"></span> 
+            <button onclick="cerrarSesion()" class="bg-red-900/40 hover:bg-red-900 text-red-300 px-2.5 py-1 rounded text-xs border border-red-700 transition">Salir</button>
         </div>
     </header>
 
-    <!-- CONTENEDOR PRINCIPAL TIPO APP -->
-    <main class="flex-grow p-3 sm:p-6 flex flex-col items-center justify-start w-full max-w-xl mx-auto">
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-grow p-3 sm:p-4 max-w-lg mx-auto w-full flex flex-col justify-center space-y-4">
 
-        <!-- PANTALLA 1: LOGIN INSTITUCIONAL -->
-        <div id="login-section" class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl w-full max-w-sm border border-slate-200 my-auto">
-            <div class="mb-6 text-center">
-                <div class="inline-block p-3 rounded-2xl bg-amber-50 border border-amber-200/60 mb-2 shadow-sm">
-                    <span class="text-3xl font-black text-app-gold tracking-tight">PROFE</span>
-                </div>
-                <h2 class="text-xl font-black text-slate-900 tracking-tight">Acceso Institucional</h2>
-                <p class="text-[11px] text-slate-500 font-medium mt-1">Sistema de Validación de Refrigerios</p>
-            </div>
+        <!-- PANTALLA 1: LOGIN DE ADMINISTRADOR -->
+        <div id="login-section" class="bg-slate-800 p-5 sm:p-6 rounded-xl border border-slate-700 shadow-xl w-full">
+            <h2 class="text-lg sm:text-xl font-semibold mb-4 text-center text-cyan-300">Acceso Administrador</h2>
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">Correo Administrador</label>
-                    <input type="email" id="email" required placeholder="admin@minedu.gob.bo" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-900 text-sm focus:ring-2 focus:ring-app-gold focus:border-app-gold outline-none transition font-medium">
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Correo Electrónico</label>
+                    <input type="email" id="email" required class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white text-sm focus:outline-none focus:border-cyan-400">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">Contraseña</label>
-                    <input type="password" id="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-900 text-sm focus:ring-2 focus:ring-app-gold focus:border-app-gold outline-none transition font-medium">
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Contraseña</label>
+                    <input type="password" id="password" required class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white text-sm focus:outline-none focus:border-cyan-400">
                 </div>
-                <button type="submit" class="w-full bg-app-gold hover:bg-app-gold-hover text-white font-extrabold p-3.5 rounded-xl text-sm transition duration-300 shadow-md shadow-amber-500/20">ENTRAR AL SISTEMA</button>
-                <p id="login-error" class="text-red-600 text-xs text-center hidden mt-2 font-medium"></p>
+                <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold p-2.5 rounded text-sm transition">Ingresar al Sistema</button>
+                <p id="login-error" class="text-red-400 text-xs sm:text-sm text-center hidden mt-2"></p>
             </form>
         </div>
 
-        <!-- PANTALLA 2: APLICACIÓN MÓVIL (ESCÁNER PRIMERO) -->
-        <div id="app-section" class="hidden w-full space-y-4 pb-12">
+        <!-- PANTALLA 2: APLICACIÓN (ESCANER Y GESTIÓN) -->
+        <div id="app-section" class="hidden space-y-4 w-full">
             
-            <!-- TARJETA DEL ESCÁNER QR -->
-            <div class="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center">
-                <div class="w-full flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
-                    <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="text-app-gold">📷</span> Escáner de Código QR
-                    </h3>
-                    <span class="text-[9px] font-mono bg-slate-100 px-2.5 py-0.5 rounded-full text-slate-600 border border-slate-200 font-bold">Cámara Activa</span>
-                </div>
+            <!-- PANEL DE ADMINISTRACIÓN -->
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-xl space-y-3">
+                <h3 class="text-xs sm:text-sm font-semibold text-cyan-300 uppercase tracking-wider">Panel de Administración</h3>
                 
-                <!-- Visor con borde neón tricolor -->
-                <div id="reader" class="w-full max-w-[260px] aspect-square rounded-2xl overflow-hidden neon-tricolor-border bg-black shadow-inner relative my-2">
-                    <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                        <div class="w-3/4 h-3/4 border-2 border-dashed border-amber-400/80 rounded-xl"></div>
-                    </div>
-                </div>
-                <p class="text-[10px] text-slate-400 font-medium text-center mt-1">Enfoque el código QR del participante dentro del recuadro.</p>
-            </div>
-
-            <!-- RESULTADO DE LA VALIDACIÓN (CON DIAGNÓSTICO) -->
-            <div id="result-box" class="hidden p-5 rounded-3xl text-center border transition-all shadow-md">
-                <p id="result-title" class="text-lg font-black tracking-tight"></p>
-                <p id="result-name" class="text-sm font-bold mt-1.5"></p>
-                <p id="result-details" class="text-xs mt-1 font-medium opacity-90 break-all"></p>
-                <button onclick="reiniciarEscanner()" class="mt-3.5 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition mx-auto flex items-center gap-1 shadow-sm">
-                    🔄 ESCANEAR SIGUIENTE
-                </button>
-            </div>
-
-            <!-- TARJETA DE ADMINISTRACIÓN Y GESTIÓN -->
-            <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 space-y-3">
-                <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <span class="text-app-gold">⚡</span> Panel de Administración
-                </h3>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <button onclick="descargarPlantillaExcel()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs py-2.5 px-3 rounded-xl border border-slate-200 transition font-bold flex items-center justify-center gap-1.5">
-                        📥 Plantilla
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button onclick="descargarPlantillaExcel()" class="bg-slate-700 hover:bg-slate-600 text-cyan-300 text-xs py-2 px-3 rounded border border-slate-600 transition flex items-center justify-center gap-1">
+                        📥 Descargar Plantilla Excel
                     </button>
-                    <button onclick="descargarReporteExcel()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs py-2.5 px-3 rounded-xl border border-emerald-200 transition font-bold flex items-center justify-center gap-1.5">
-                        📊 Reporte
-                    </button>
-                    <button onclick="confirmarReinicio()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs py-2.5 px-3 rounded-xl border border-amber-200 transition font-bold flex items-center justify-center gap-1.5">
-                        🔄 Reiniciar
+                    <button onclick="confirmarReinicio()" class="bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 text-xs py-2 px-3 rounded border border-amber-700 transition flex items-center justify-center gap-1">
+                        🔄 Reiniciar Día
                     </button>
                 </div>
 
                 <!-- CARGA DE EXCEL -->
-                <div class="pt-2 border-t border-slate-100">
-                    <label class="block text-[10px] text-slate-500 font-bold uppercase mb-1">Cargar Padrón (.xlsx, .csv):</label>
-                    <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="procesarExcel(event)" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-app-gold file:text-white hover:file:bg-app-gold-hover cursor-pointer bg-slate-50 rounded-xl p-1.5 border border-slate-200">
+                <div class="pt-2 border-t border-slate-700">
+                    <label class="block text-xs text-slate-400 mb-1">Subir Padrón (.xlsx o .csv):</label>
+                    <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="procesarExcel(event)" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-slate-950 hover:file:bg-cyan-400 cursor-pointer">
                 </div>
             </div>
 
+            <!-- ESCANER DE CÁMARA -->
+            <div class="bg-slate-800 p-3 sm:p-4 rounded-xl border border-slate-700 shadow-xl text-center">
+                <h2 class="text-sm sm:text-md font-medium text-slate-300 mb-2">Escanear Código QR</h2>
+                <div id="reader" class="w-full rounded overflow-hidden border border-slate-700"></div>
+            </div>
+
+            <!-- RESULTADO DE LA VALIDACIÓN -->
+            <div id="result-box" class="hidden p-4 rounded-xl text-center border transition-all">
+                <p id="result-title" class="text-base sm:text-lg font-bold"></p>
+                <p id="result-name" class="text-lg sm:text-xl font-semibold mt-1"></p>
+                <p id="result-details" class="text-xs sm:text-sm mt-2"></p>
+                <button onclick="reiniciarEscanner()" class="mt-4 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-xs sm:text-sm">Escanear Siguiente</button>
+            </div>
         </div>
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 text-center py-3 text-[10px] text-slate-500 z-50">
-        <p class="font-bold text-slate-700">SEGURIDAD DE GRADO INSTITUCIONAL</p>
-        <p class="mt-0.5">MINISTERIO DE EDUCACIÓN © 2026 PROFE BOLIVIA</p>
+    <footer class="text-center py-3 text-xs text-slate-500 border-t border-slate-800">
+        Sistema Seguro anti-duplicados • PROFE
     </footer>
 
-    <!-- SCRIPT DE FIREBASE Y LÓGICA -->
+    <!-- SCRIPT DE FIREBASE REALTIME DATABASE Y LÓGICA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+        // ==========================================
+        // CREDENCIALES OFICIALES DE FIREBASE
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyCYL6LrCODSyctVDYlde8PilNmSfM_fqb4",
             authDomain: "control-refrigerios-profe.firebaseapp.com",
@@ -172,54 +112,40 @@
 
         let html5QrCode = null;
         let scannerIsRunning = false;
-        let lastResult;
 
+        // Login de Administrador
         window.handleLogin = async function(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             const errorElement = document.getElementById('login-error');
-            const loginBtn = e.target.querySelector('button');
 
             try {
                 errorElement.classList.add('hidden');
-                loginBtn.textContent = "Validando...";
-                loginBtn.disabled = true;
-
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                errorElement.textContent = "Credenciales incorrectas o acceso denegado.";
+                errorElement.textContent = "Error: Credenciales incorrectas.";
                 errorElement.classList.remove('hidden');
-            } finally {
-                loginBtn.textContent = "ENTRAR AL SISTEMA";
-                loginBtn.disabled = false;
             }
         };
 
+        // Cerrar Sesión
         window.cerrarSesion = function() {
-            if (confirm("¿Cerrar sesión de administrador?")) {
-                signOut(auth);
-            }
+            signOut(auth);
         };
 
+        // Control de Estado de Sesión
         onAuthStateChanged(auth, (user) => {
-            const loginSection = document.getElementById('login-section');
-            const appSection = document.getElementById('app-section');
-            const userInfo = document.getElementById('user-info');
-            const userEmailSpan = document.getElementById('user-email');
-
             if (user) {
-                loginSection.classList.add('hidden');
-                appSection.classList.remove('hidden');
-                userInfo.classList.remove('hidden');
-                userInfo.classList.add('flex');
-                userEmailSpan.textContent = user.email;
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('app-section').classList.remove('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('user-email').textContent = user.email;
                 iniciarEscanner();
             } else {
-                loginSection.classList.remove('hidden');
-                appSection.classList.add('hidden');
-                userInfo.classList.add('hidden');
-                userInfo.classList.remove('flex');
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('app-section').classList.add('hidden');
+                document.getElementById('user-info').classList.add('hidden');
                 
                 if (scannerIsRunning && html5QrCode) {
                     html5QrCode.stop().then(() => { scannerIsRunning = false; }).catch(err => console.log(err));
@@ -227,126 +153,85 @@
             }
         });
 
-        function onScanSuccess(decodedText) {
-            if (decodedText !== lastResult) {
-                lastResult = decodedText;
-                if (scannerIsRunning) {
-                    html5QrCode.pause();
-                    scannerIsRunning = false;
-                }
-                verificarYEntregarRefrigerio(decodedText);
-            }
-        }
-
+        // Inicializar Escáner QR
         function iniciarEscanner() {
             if (scannerIsRunning) return;
-            const config = {
-                fps: 5,
-                qrbox: { width: 180, height: 180 },
-                aspectRatio: 1.0,
-                videoConstraints: { facingMode: "environment" }
-            };
-
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("reader");
-            }
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 220, height: 220 } };
 
             html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
                 .then(() => { scannerIsRunning = true; })
-                .catch(err => console.error("Error cámara: ", err));
+                .catch(err => console.log("Error cámara: ", err));
         }
 
-        window.reiniciarEscanner = function() {
-            const resultBox = document.getElementById('result-box');
-            resultBox.classList.add('hidden');
-            resultBox.classList.remove('bg-emerald-100', 'border-emerald-400', 'text-emerald-900', 'bg-red-100', 'border-red-400', 'text-red-900', 'bg-amber-100', 'border-amber-400', 'text-amber-900');
-            
-            if (html5QrCode && !scannerIsRunning) {
-                lastResult = undefined;
-                html5QrCode.resume();
-                scannerIsRunning = true;
+        async function onScanSuccess(decodedText) {
+            if (scannerIsRunning && html5QrCode) {
+                await html5QrCode.pause();
+                scannerIsRunning = false;
             }
-        };
+            verificarYEntregarRefrigerio(decodedText.trim());
+        }
 
-        // Verificación con diagnóstico del texto exacto leído por la cámara
-        async function verificarYEntregarRefrigerio(rawId) {
+        // Lógica de Validación y Anti-Duplicados (Realtime Database)
+        async function verificarYEntregarRefrigerio(id) {
             const resultBox = document.getElementById('result-box');
             const resultTitle = document.getElementById('result-title');
             const resultName = document.getElementById('result-name');
             const resultDetails = document.getElementById('result-details');
 
-            // Limpieza robusta del ID
-            let id = String(rawId || "").trim();
-            if (id.endsWith('.0')) {
-                id = id.slice(0, -2);
-            }
-
-            resultBox.classList.remove('hidden', 'bg-emerald-100', 'border-emerald-400', 'text-emerald-900', 'bg-red-100', 'border-red-400', 'text-red-900', 'bg-amber-100', 'border-amber-400', 'text-amber-900');
-            resultTitle.textContent = "Verificando...";
-            resultName.textContent = `Buscando ID: ${id}`;
-            resultDetails.textContent = "Sincronizando en tiempo real...";
-            resultBox.classList.add('bg-slate-100', 'border-slate-300', 'text-slate-800');
+            resultBox.classList.remove('hidden', 'bg-emerald-950', 'border-emerald-600', 'bg-red-950', 'border-red-600');
 
             try {
                 const participanteRef = ref(db, 'participantes/' + id);
-                let resultadoOperacion = null;
-                let nombreParticipante = "";
-                let horaGuardada = "";
+                const snapshot = await get(participanteRef);
 
-                await runTransaction(participanteRef, (currentData) => {
-                    if (!currentData) {
-                        resultadoOperacion = "no_existe";
-                        return;
+                if (!snapshot.exists()) {
+                    resultBox.classList.add('bg-red-950', 'border-red-600');
+                    resultTitle.textContent = "❌ CÓDIGO INVÁLIDO";
+                    resultName.textContent = `ID: ${id}`;
+                    resultDetails.textContent = "Este código QR no se encuentra registrado en el padrón.";
+                } else {
+                    const data = snapshot.val();
+
+                    if (data.entregado === true) {
+                        resultBox.classList.add('bg-red-950', 'border-red-600');
+                        resultTitle.textContent = "⚠️ ¡ALERTA: ENTREGA DOBLE!";
+                        resultName.textContent = data.nombre || "Sin Nombre";
+                        resultDetails.textContent = `Ya retiró su refrigerio a las: ${data.horaEntrega || '---'}.`;
+                    } else {
+                        const horaActual = new Date().toLocaleTimeString();
+                        await update(participanteRef, {
+                            entregado: true,
+                            horaEntrega: horaActual
+                        });
+
+                        resultBox.classList.add('bg-emerald-950', 'border-emerald-600');
+                        resultTitle.textContent = "✅ ¡REFRIGERIO AUTORIZADO!";
+                        resultName.textContent = data.nombre || "Participante";
+                        resultDetails.textContent = `Registrado con éxito a las ${horaActual}.`;
                     }
-
-                    if (currentData.entregado === true) {
-                        resultadoOperacion = "ya_entregado";
-                        nombreParticipante = currentData.nombre;
-                        horaGuardada = currentData.horaEntrega;
-                        return;
-                    }
-
-                    const horaActual = new Date().toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
-                    currentData.entregado = true;
-                    currentData.horaEntrega = horaActual;
-                    nombreParticipante = currentData.nombre;
-                    horaGuardada = horaActual;
-                    resultadoOperacion = "exito";
-                    
-                    return currentData;
-                });
-
-                resultBox.classList.remove('bg-slate-100', 'border-slate-300', 'text-slate-800');
-
-                if (resultadoOperacion === "no_existe") {
-                    resultBox.classList.add('bg-red-100', 'border-red-400', 'text-red-900');
-                    resultTitle.textContent = "❌ CÓDIGO NO RECONOCIDO";
-                    resultName.textContent = `Texto leído: "${rawId}"`;
-                    resultDetails.textContent = "Este texto no coincide con ningún carnet guardado en Firebase. Vuelve a cargar el Excel o revisa el QR.";
-                } else if (resultadoOperacion === "ya_entregado") {
-                    resultBox.classList.add('bg-amber-100', 'border-amber-400', 'text-amber-900');
-                    resultTitle.textContent = "⚠️ ¡ENTREGA DOBLE BLOQUEADA!";
-                    resultName.textContent = nombreParticipante || "Participante";
-                    resultDetails.textContent = `Este refrigerio ya fue retirado a las ${horaGuardada || '---'} Hrs.`;
-                } else if (resultadoOperacion === "exito") {
-                    resultBox.classList.add('bg-emerald-100', 'border-emerald-400', 'text-emerald-900');
-                    resultTitle.textContent = "✅ ¡AUTORIZADO!";
-                    resultName.textContent = nombreParticipante || "Participante";
-                    resultDetails.textContent = `Refrigerio entregado a las ${horaGuardada} Hrs.`;
                 }
-
             } catch (error) {
-                resultBox.classList.add('bg-red-100', 'border-red-400', 'text-red-900');
+                resultBox.classList.add('bg-red-950', 'border-red-600');
                 resultTitle.textContent = "❌ ERROR";
-                resultName.textContent = "Fallo técnico";
+                resultName.textContent = "Error al procesar";
                 resultDetails.textContent = error.message;
             }
         }
 
+        window.reiniciarEscanner = function() {
+            document.getElementById('result-box').classList.add('hidden');
+            if (html5QrCode && !scannerIsRunning) {
+                html5QrCode.resume();
+                scannerIsRunning = true;
+            }
+        };
+
+        // Descargar Plantilla Excel de Ejemplo
         window.descargarPlantillaExcel = function() {
             const templateData = [
-                { id: "7654321", nombre: "QUISPE MAMANI, CARLOS" },
-                { id: "1234567", nombre: "MOLINA VARGAS, ANA" }
+                { id: "5637347", nombre: "GISBERT MAMANI CINTIA VERONICA" },
+                { id: "14122404", nombre: "VALENCIA CATARI JUAN PABLO" }
             ];
             const worksheet = XLSX.utils.json_to_sheet(templateData);
             const workbook = XLSX.utils.book_new();
@@ -354,36 +239,7 @@
             XLSX.writeFile(workbook, "plantilla_participantes_profe.xlsx");
         };
 
-        window.descargarReporteExcel = async function() {
-            try {
-                const participantesRef = ref(db, 'participantes');
-                const snapshot = await get(participantesRef);
-                
-                if (!snapshot.exists()) {
-                    alert("No hay registros en la base de datos.");
-                    return;
-                }
-
-                let reportData = [];
-                snapshot.forEach((child) => {
-                    const data = child.val();
-                    reportData.push({
-                        "C.I. / ID": child.key,
-                        "Nombre Completo": data.nombre || "Sin Nombre",
-                        "Estado": data.entregado ? "ENTREGADO" : "NO ENTREGADO",
-                        "Hora de Entrega": data.horaEntrega || "---"
-                    });
-                });
-
-                const worksheet = XLSX.utils.json_to_sheet(reportData);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte Entregas");
-                XLSX.writeFile(workbook, `reporte_refrigerios_${new Date().toISOString().slice(0,10)}.xlsx`);
-            } catch (error) {
-                alert("Error al generar el reporte: " + error.message);
-            }
-        };
-
+        // Carga Masiva de Excel a Realtime Database
         window.procesarExcel = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -401,63 +257,35 @@
                         return;
                     }
 
-                    if (!confirm(`Se encontraron ${jsonRows.length} registros. ¿Desea subirlos?`)) {
-                        event.target.value = "";
-                        return;
-                    }
-
-                    let updates = {};
                     let contador = 0;
-
                     for (let row of jsonRows) {
-                        let idVal = "";
-                        let nombreVal = "";
-
-                        for (let key in row) {
-                            const kLower = key.toLowerCase().trim();
-                            if (kLower === 'id' || kLower === 'c.i.' || kLower === 'ci' || kLower === 'carnet' || kLower === 'cedula' || kLower.includes('c.i')) {
-                                idVal = String(row[key]).trim();
-                            }
-                        }
-
-                        for (let key in row) {
-                            const kLower = key.toLowerCase().trim();
-                            if (kLower === 'nombre' || kLower === 'nombres' || kLower === 'nombre completo') {
-                                nombreVal = String(row[key]).trim();
-                            }
-                        }
-
-                        if (idVal.endsWith('.0')) {
-                            idVal = idVal.slice(0, -2);
-                        }
+                        let idVal = String(row.id || row.C_I || row.CI || row.carnet || "").trim();
+                        let nombreVal = String(row.nombre || row.Nombres || "").trim();
 
                         if (idVal && idVal !== "nan" && nombreVal && nombreVal !== "nan") {
-                            updates['participantes/' + idVal] = {
+                            const participanteRef = ref(db, 'participantes/' + idVal);
+                            await set(participanteRef, {
                                 nombre: nombreVal,
                                 entregado: false,
                                 horaEntrega: ""
-                            };
+                            });
                             contador++;
                         }
                     }
 
-                    if (contador === 0) {
-                        alert("No se encontraron registros válidos. Verifique las columnas del Excel (ej. id, nombre).");
-                        return;
-                    }
-
-                    await update(ref(db), updates);
-                    alert(`¡Carga exitosa! ${contador} participantes registrados correctamente.`);
-                    event.target.value = "";
+                    alert(`¡Carga exitosa! Se registraron ${contador} participantes en Firebase.`);
+                    document.getElementById('excel-file').value = "";
                 } catch (error) {
-                    alert("Error al procesar: " + error.message);
+                    console.error("Error detallado:", error);
+                    alert("Error al guardar en Firebase: " + error.message);
                 }
             };
             reader.readAsArrayBuffer(file);
         };
 
+        // Reiniciar Jornada Diaria
         window.confirmarReinicio = async function() {
-            if (!confirm("⚠️ ¿Desea reiniciar los estados de entrega del día?")) return;
+            if (!confirm("¿Reiniciar registros para un nuevo día?")) return;
             try {
                 const participantesRef = ref(db, 'participantes');
                 const snapshot = await get(participantesRef);
@@ -472,12 +300,12 @@
                         count++;
                     });
                     await update(ref(db), updates);
-                    alert(`¡Jornada reiniciada! ${count} participantes habilitados nuevamente.`);
+                    alert(`¡Jornada reiniciada! ${count} participantes habilitados.`);
                 } else {
-                    alert("No hay registros.");
+                    alert("No hay participantes registrados.");
                 }
             } catch (error) {
-                alert("Error: " + error.message);
+                alert("Error al reiniciar: " + error.message);
             }
         };
     </script>
